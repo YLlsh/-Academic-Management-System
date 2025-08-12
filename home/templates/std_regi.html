@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Registration - Academic Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: cursive, sans-serif;
+    }
+
+    body {
+      border: 2px solid black;
+      background-color: #fff;
+    }
+
+    /* Header Section */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #000;
+      padding: 10px;
+    }
+
+    .logo {
+      width: 120px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border-right: 1px solid #0074a2;
+    }
+
+    .title-section {
+      flex-grow: 1;
+      text-align: center;
+      padding: 5px;
+      border-left: 1px solid #0074a2;
+      border-right: 1px solid #0074a2;
+    }
+
+    .school-name {
+      font-size: 16px;
+      border-bottom: 1px solid #0074a2;
+      padding-bottom: 3px;
+    }
+
+    .system-name {
+      font-size: 20px;
+      font-weight: bold;
+      padding-top: 3px;
+    }
+
+    .profile {
+      width: 100px;
+      text-align: center;
+      font-size: 14px;
+      border-left: 1px solid #0074a2;
+    }
+
+    /* Info Box Section */
+    .top-info {
+      display: flex;
+      border-bottom: 1px solid #000;
+    }
+
+    .sidebar-logo {
+      width: 100px;
+      border-right: 1px solid #0074a2;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .info-box {
+      flex-grow: 1;
+      text-align: center;
+      padding: 10px;
+      border-right: 1px solid #0074a2;
+      font-weight: bold;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      padding: 10px;
+      text-align: center;
+    }
+
+    .search-bar input {
+      width: 50%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #0074a2;
+      border-radius: 5px;
+    }
+
+    /* Greeting Section */
+    .greeting {
+      margin: 20px auto;
+      border: 1px solid #0074a2;
+      text-align: center;
+      padding: 40px 20px;
+      width: 80%;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    /* Recent Activity */
+    .recent-activity {
+      margin: 20px auto;
+      border: 1px solid #0074a2;
+      text-align: center;
+      padding: 20px;
+      width: 80%;
+      font-size: 16px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid #000;
+      text-align: center;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+
+
+
+    /* Form Section */
+    .form-section {
+      margin: 20px auto;
+      width: 80%;
+      border: 1px solid #0074a2;
+      padding: 20px;
+      border-radius: 5px;
+      background: #f9f9f9;
+    }
+
+    #messages {
+      margin: 20px auto;
+      width: 80%;
+      border: 1px solid #0074a2;
+      padding: 20px;
+      border-radius: 5px;
+
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #0074a2;
+      border-radius: 5px;
+    }
+
+    .form-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #0074a2;
+      color: white;
+      cursor: pointer;
+    }
+
+    .form-group .reset-btn {
+      background-color: #777;
+    }
+
+    .form-group button:hover {
+      opacity: 0.9;
+    }
+
+    button[type='submit'],
+    button[type='reset'] {
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">LOGO</div>
+    <div class="title-section">
+      <div class="school-name">schoolName</div>
+      <div class="system-name">Academic Management System</div>
+    </div>
+    <div class="profile">Profile<br>Icon</div>
+  </header>
+
+  <!-- Top Info Boxes -->
+  <section class="top-info">
+    <div class="sidebar-logo">Side bar<br>logo</div>
+    <div class="info-box">Total student</div>
+    <div class="info-box">Total teacher</div>
+    <div class="info-box">Attendance in<br>percental</div>
+  </section>
+
+  <!-- Page Title -->
+  <section class="greeting">
+    <h1>Student Registration Form</h1>
+  </section>
+  {% if messages %}
+
+  {% for message in messages %}
+  <div id="messages" class="alert alert-success" role="alert">
+    {{ message }}
+  </div>
+
+  {% endfor %}
+
+  {% endif %}
+  <!-- Registration Form -->
+  <section class="form-section">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Full Name:</label>
+        <input type="text" placeholder="Enter full name" name="student_name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Student Id</label>
+        <input type="text" placeholder="Enter Student Id" name="std_id" required>
+      </div>
+
+
+      <div class="form-group">
+        <label>Date of Birth:</label>
+        <input type="date" name="bod" required>
+      </div>
+
+      <div class="form-group">
+        <label>Gender:</label>
+        <select name="gender" required>
+          <option value="">Select gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+
+
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" placeholder="Enter email" name="email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number:</label>
+        <input type="tel" placeholder="Enter phone number" name="contact" required>
+      </div>
+
+      <!-- <div class="form-group">
+        <label>Address:</label>
+        <textarea placeholder="Enter address" rows="3" required></textarea>
+      </div> -->
+
+      <div class="form-group">
+        <label>Class:</label>
+        <select name="student_class" required>
+          <option value="">Select class</option>
+          <option>1st</option>
+          <option>2nd</option>
+          <option>3rd</option>
+          <option>4th</option>
+          <option>5th</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <button type="submit">Register</button>
+        <button type="reset" class="reset-btn">Reset</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Footer</p>
+  </footer>
+
+</body>
+
+</html>

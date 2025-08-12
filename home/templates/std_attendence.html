@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Attendance - Academic Management System</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: cursive, sans-serif;
+        }
+
+        body {
+            border: 2px solid black;
+            background-color: #fff;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #000;
+            padding: 10px;
+        }
+
+        .logo {
+            width: 120px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-right: 1px solid #0074a2;
+        }
+
+        .title-section {
+            flex-grow: 1;
+            text-align: center;
+            padding: 5px;
+            border-left: 1px solid #0074a2;
+            border-right: 1px solid #0074a2;
+        }
+
+        .school-name {
+            font-size: 16px;
+            border-bottom: 1px solid #0074a2;
+            padding-bottom: 3px;
+        }
+
+        .system-name {
+            font-size: 20px;
+            font-weight: bold;
+            padding-top: 3px;
+        }
+
+        .profile {
+            width: 100px;
+            text-align: center;
+            font-size: 14px;
+            border-left: 1px solid #0074a2;
+        }
+
+        /* Info Box Section */
+        .top-info {
+            display: flex;
+            border-bottom: 1px solid #000;
+        }
+
+        .sidebar-logo {
+            width: 100px;
+            border-right: 1px solid #0074a2;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .info-box {
+            flex-grow: 1;
+            text-align: center;
+            padding: 10px;
+            border-right: 1px solid #0074a2;
+            font-weight: bold;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .search-bar input {
+            width: 50%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #0074a2;
+            border-radius: 5px;
+        }
+
+        /* Greeting Section */
+        .greeting {
+            margin: 20px auto;
+            border: 1px solid #0074a2;
+            text-align: center;
+            padding: 40px 20px;
+            width: 80%;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            margin: 20px auto;
+            border: 1px solid #0074a2;
+            text-align: center;
+            padding: 20px;
+            width: 80%;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid #000;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+
+        /* Attendance Table Section */
+        .attendance-table-section {
+            margin: 20px auto;
+            width: 80%;
+            border: 1px solid #0074a2;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .attendance-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: cursive, sans-serif;
+        }
+
+        .attendance-table th,
+        .attendance-table td {
+            border: 1px solid #0074a2;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .attendance-table th {
+            background-color: #0074a2;
+            color: white;
+            font-weight: bold;
+        }
+
+        .attendance-table tbody tr:nth-child(even) {
+            background-color: #e3f0fa;
+        }
+
+        .attendance-table input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        /* Adjust input focus style */
+        .attendance-table input[type="checkbox"]:focus {
+            outline: 2px solid #0074a2;
+        }
+
+        input[type="text"] {
+            background: local;
+            border: 0px;
+            text-align: center;
+            width: 10px;
+        }
+
+        .btn {
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 13px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0074a2;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">LOGO</div>
+        <div class="title-section">
+            <div class="school-name">schoolName</div>
+            <div class="system-name">Academic Management System</div>
+        </div>
+        <div class="profile">Profile<br>Icon</div>
+    </header>
+
+    <!-- Top Info Boxes -->
+    <section class="top-info">
+        <div class="sidebar-logo">Side bar<br>logo</div>
+        <div class="info-box">Total Students</div>
+        <div class="info-box">Total Present</div>
+        <div class="info-box">Attendance</div>
+    </section>
+
+    <!-- Search -->
+    <section class="search-bar">
+        <input type="text" placeholder="Search student..." />
+    </section>
+    <!-- Attendance Table -->
+    <section class="attendance-table-section">
+
+        <h2>Attendance for {{ today }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Present</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.student_name }}</td>
+                        <td>
+                            <input type="checkbox" name="attendance_{{ student.std_id }}" {% if
+                                attendance_dict.student.id==student.id or attendance_dict.student_id==student.id or
+                                attendance_dict|get_item:student.id %} 
+                                checked 
+                                {% endif %}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit">Save Attendance</button>
+        </form>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Footer</p>
+    </footer>
+
+</body>
+
+</html>

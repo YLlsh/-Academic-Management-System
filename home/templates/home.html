@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Academic Management System</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            /* margin: 0;
+            padding: 0; */
+            box-sizing: border-box;
+            font-family: cursive, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            border: 2px solid black;
+            background-color: #fff;
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #000;
+            padding: 10px;
+        }
+
+        .logo {
+            width: 120px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border-right: 1px solid #0074a2;
+        }
+
+        .title-section {
+            flex-grow: 1;
+            text-align: center;
+            padding: 5px;
+            border-left: 1px solid #0074a2;
+            border-right: 1px solid #0074a2;
+        }
+
+        .school-name {
+            font-size: 16px;
+            border-bottom: 1px solid #0074a2;
+            padding-bottom: 3px;
+        }
+
+        .system-name {
+            font-size: 20px;
+            font-weight: bold;
+            padding-top: 3px;
+        }
+
+        .profile {
+            width: 100px;
+            text-align: center;
+            font-size: 14px;
+            border-left: 1px solid #0074a2;
+        }
+
+        /* Info Box Section */
+        .top-info {
+            display: flex;
+            border-bottom: 1px solid #000;
+        }
+
+
+
+
+        .info-box {
+            flex-grow: 1;
+            text-align: center;
+            padding: 10px;
+            border-right: 1px solid #0074a2;
+            font-weight: bold;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .search-bar input {
+            width: 50%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #0074a2;
+            border-radius: 5px;
+        }
+
+        /* Greeting Section */
+        .greeting {
+            margin: 20px auto;
+            border: 1px solid #0074a2;
+            text-align: center;
+            padding: 40px 20px;
+            width: 80%;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            margin: 20px auto;
+            border: 1px solid #0074a2;
+            text-align: center;
+            padding: 20px;
+            width: 80%;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid #000;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .menu-icon {
+            color: rgb(0, 0, 0);
+            font-size: 30px;
+            align-items: center;
+        }
+
+        .profile {
+            font-size: 30px;
+        }
+
+        
+        .sidebar-logo {
+            width: 250px;
+            background-color: #2c3e50;
+            position: absolute;
+            height: 400px;
+            padding: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .side_bar {
+            
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side_bar a {
+            /* display: none ; */
+            padding: 12px 15px;
+            margin: 8px 0;
+            text-decoration: none;
+            color: white;
+            background-color: #34495e;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .side_bar a:hover {
+            background-color: #1abc9c;
+        }
+
+        /* Hide sidebar when collapsed */
+        .collapsed {
+            width: 60px;
+            overflow: hidden;
+            height: 70px;
+        }
+
+        .collapsed .side_bar a {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">LOGO</div>
+        <div class="title-section">
+            <div class="school-name">schoolName</div>
+            <div class="system-name">Academic Management System</div>
+        </div>
+        <div class="profile"><i class="fas fa-user profile"></i>
+        </div>
+    </header>
+
+    <!-- Top Info Boxes -->
+    <section class="top-info">
+        <div class="sidebar-logo" id="sidebar">
+            <i class="fas fa-bars menu-icon" id="toggleBtn"></i>
+            <div class="side_bar">
+                <a href="#">Student Registration</a>
+                <a href="#">Teacher Registration</a>
+                <a href="#">Mark Attendance</a>
+                <a href="#">Schedule Exam</a>
+                <a href="#">View Results</a>
+            </div>
+        </div>
+
+        <div class="info-box">Total student</div>
+        <div class="info-box">Total teacher</div>
+        <div class="info-box">Attendance in<br>percental</div>
+    </section>
+
+    <!-- Search -->
+    <section class="search-bar">
+        <input type="text" placeholder="Search..." />
+    </section>
+
+    <!-- Greeting Section -->
+    <section class="greeting">
+        <h1>Greeting section</h1>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="recent-activity">
+        <p>Recent activity</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Footer</p>
+    </footer>
+
+    
+  <script>
+    const toggleBtn = document.getElementById('toggleBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+  </script>
+
+</body>
+
+</html>

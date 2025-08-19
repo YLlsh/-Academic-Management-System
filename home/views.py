@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
-from home.models import *
+from .models import *
+from home import models
+
+from datetime import date
 
 from django.contrib import messages
 # Create your views
@@ -27,3 +30,45 @@ def student_regi(request):
         return redirect("/")
     return render(request, "std_regi.html")
 
+from datetime import date
+
+def student_attendance(request):
+    if request.method == "POST":
+        pr = request.POST.getlist("Present")
+        ab = request.POST.getlist("Absent")
+
+        Students = Student_info.objects.all()
+        att=Student_Attendence.objects.all()
+
+        for d in att:
+            if d.date == date.today():
+                messages.info(request,"Today's attendence are already Done")
+                return redirect("/a/")
+            
+            
+
+        for s in Students:
+            if f"Present_{s.std_id}" in pr:
+                attendance = True
+            elif f"Absent_{s.std_id}" in ab:
+                attendance = False
+            else:
+                continue   # if no selection, skip
+
+            Student_Attendence.objects.create(
+                Student=s,
+                date=date.today(),
+                attendance=attendance,
+            )
+
+        messages.info(request,"Today's attendence are Complete")
+        return redirect("/a/")
+            
+
+  
+    Students = Student_info.objects.all()
+    context = {
+        "Students":Students
+    }
+
+    return render(request, 'std_attendence.html',context)

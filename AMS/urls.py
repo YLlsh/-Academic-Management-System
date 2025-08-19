@@ -22,5 +22,5 @@ from home.views import *
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("",student_regi,name="std_regi"),
-    path("a/",student_attendance,name="student_attendance")
+    path("a/",student_attendance, name="student_attendance")
 ]

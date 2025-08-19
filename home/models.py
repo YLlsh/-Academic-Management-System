@@ -5,7 +5,7 @@ from datetime import date,datetime
 
 class Student_info(models.Model):
     student_name = models.CharField(max_length=100)
-    std_id = models.IntegerField(unique=True)
+    std_id = models.IntegerField(primary_key=True, unique=True)
     bod =  models.DateField(default='2000-01-01')
     age = models.IntegerField()
 
@@ -30,12 +30,12 @@ class Student_info(models.Model):
 
 
 
-class student_attendence(models.Model):
-    student = models.ForeignKey(Student_info,default=None ,on_delete=models.CASCADE)
+class Student_Attendence(models.Model):
+    Student = models.ForeignKey(Student_info,on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     attendance = models.BooleanField()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['student', 'date'], name='unique_attendance_per_day')
+            models.UniqueConstraint(fields=['Student', 'date'], name='unique_attendance_per_day')
         ]

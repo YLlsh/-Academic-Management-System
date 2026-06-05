@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EduManage - Parent Dashboard</title>
+<link rel="stylesheet" href="/static/assets/css/style.css">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f6f9;
+        color: #2c3e50;
+    }
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: #2c3e50;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .logo {
+        font-size: 22px;
+        font-weight: bold;
+        color: #6fa8ff;
+    }
+    .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 25px;
+        margin: 0;
+        padding: 0;
+    }
+    .nav-links a {
+        text-decoration: none;
+        color: white;
+        font-size: 15px;
+        transition: color 0.3s ease;
+    }
+    .nav-links a:hover {
+        color: #6fa8ff;
+    }
+    .logout-btn {
+        background: #e74c3c;
+        border: none;
+        padding: 8px 16px;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+    .logout-btn:hover {
+        background: #c0392b;
+    }
+    .container {
+        width: 85%;
+        max-width: 1200px;
+        margin: 40px auto;
+    }
+    .welcome-banner {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    .welcome-banner h1 {
+        margin: 0 0 10px 0;
+    }
+    .welcome-banner p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+        margin-top: 0;
+        color: #2c3e50;
+        border-bottom: 2px solid #f0f2f5;
+        padding-bottom: 10px;
+    }
+    .student-card {
+        background: #f8fafe;
+        border: 1px solid #e1e8ed;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    .student-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .student-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #357abd;
+    }
+    .student-badge {
+        background: #e1f5fe;
+        color: #0288d1;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    .student-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px dashed #cbd5e1;
+    }
+    .stat-box {
+        display: flex;
+        flex-direction: column;
+    }
+    .stat-box label {
+        font-size: 11px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .stat-box span {
+        font-size: 15px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .progress-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+    .progress-table th, .progress-table td {
+        padding: 10px;
+        font-size: 13px;
+        text-align: left;
+        border-bottom: 1px solid #eef2f5;
+    }
+    .progress-table th {
+        background: #f4f6f8;
+        font-weight: 600;
+    }
+    .notice-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f2f5;
+    }
+    .notice-item:last-child {
+        border-bottom: none;
+    }
+    .notice-date {
+        font-size: 11px;
+        color: #95a5a6;
+    }
+    .notice-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .notice-desc {
+        font-size: 13px;
+        color: #7f8c8d;
+    }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="logo">EduManage Parent</div>
+    <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#my-children">My Children</a></li>
+        <li><a href="#notice-board">Notice Board</a></li>
+    </ul>
+    <button class="logout-btn" id="logout-btn">Logout</button>
+</nav>
+
+<div class="container">
+    <div class="welcome-banner">
+        <h1 id="welcome-text">Welcome Parent 👋</h1>
+        <p>Monitor your children's academic performance, class schedules, and attendance records.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Main Column -->
+        <div class="main-column">
+            <!-- My Children -->
+            <div class="card" id="my-children">
+                <h2>My Children Details</h2>
+                <div id="children-container">
+                    <p style="color: #7f8c8d; font-style: italic;">Loading child details...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column -->
+        <div class="sidebar-column">
+            <!-- Notice Board -->
+            <div class="card" id="notice-board">
+                <h2>Notice Board</h2>
+                <div class="notice-item">
+                    <span class="notice-date">June 10, 2026</span>
+                    <div class="notice-title">Parents-Teacher Meeting</div>
+                    <div class="notice-desc">Upcoming PTM scheduled for Saturday, June 14th. Attendance is highly requested.</div>
+                </div>
+                <div class="notice-item">
+                    <span class="notice-date">June 02, 2026</span>
+                    <div class="notice-title">Terminal Exam Schedule</div>
+                    <div class="notice-desc">The schedule for term exams has been published in the examination module.</div>
+                </div>
+            </div>
+
+            <!-- Contact school support -->
+            <div class="card">
+                <h2>School Support</h2>
+                <p style="font-size: 14px; margin-bottom: 10px;">For any queries regarding classes or exams, contact support:</p>
+                <div style="font-weight: 600; font-size: 14px; color: #357abd;">📞 +91 98765 43210</div>
+                <div style="font-weight: 600; font-size: 14px; color: #357abd; margin-top: 5px;">✉️ support@edumanage.com</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadDashboardData() {
+    let accessToken = localStorage.getItem("access");
+    let refreshToken = localStorage.getItem("refresh");
+
+    async function fetchChildren(token) {
+        return fetch("http://127.0.0.1:8000/api/parent-students/", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+    }
+
+    let response = await fetchChildren(accessToken);
+
+    if (response.status === 401 && refreshToken) {
+        const refreshRes = await fetch("http://127.0.0.1:8000/api/refresh/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        if (refreshRes.ok) {
+            const refreshData = await refreshRes.json();
+            accessToken = refreshData.access;
+            localStorage.setItem("access", accessToken);
+            response = await fetchChildren(accessToken);
+        } else {
+            alert("Session expired. Please login again.");
+            window.location.href = "/login/";
+            return;
+        }
+    }
+
+    if (response.ok) {
+        const data = await response.json();
+        const container = document.getElementById("children-container");
+        container.innerHTML = "";
+
+        if (data.length === 0) {
+            container.innerHTML = `<p style="color: #95a5a6; font-style: italic;">No student records linked to your phone number.</p>`;
+            return;
+        }
+
+        data.forEach(student => {
+            let progressRows = student.progress.map(p => `
+                <tr>
+                    <td><strong>${p.month}</strong></td>
+                    <td>${p.attendance}</td>
+                    <td style="color: #27ae60; font-weight: bold;">${p.grade}</td>
+                    <td>${p.remarks}</td>
+                </tr>
+            `).join('');
+
+            let studentHTML = `
+                <div class="student-card">
+                    <div class="student-card-header">
+                        <span class="student-name">${student.full_name}</span>
+                        <span class="student-badge">${student.student_class}</span>
+                    </div>
+                    <div class="student-stats" style="margin-bottom: 20px;">
+                        <div class="stat-box">
+                            <label>Student ID</label>
+                            <span>${student.student_id}</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>Total Attendance</label>
+                            <span style="color: #27ae60;">${student.attendance}</span>
+                        </div>
+                        <div class="stat-box">
+                            <label>Course / Program</label>
+                            <span>${student.course}</span>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 15px; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Monthly Progress Tracker</h4>
+                    <table class="progress-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Attendance</th>
+                                <th>Grade</th>
+                                <th>Performance Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${progressRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            container.innerHTML += studentHTML;
+        });
+    } else {
+        document.getElementById("children-container").innerHTML = `<p style="color: #e74c3c;">Failed to load children details.</p>`;
+    }
+}
+
+document.getElementById("logout-btn").addEventListener("click", function() {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("role");
+    window.location.href = "/login/";
+});
+
+document.addEventListener("DOMContentLoaded", loadDashboardData);
+</script>
+</body>
+</html>

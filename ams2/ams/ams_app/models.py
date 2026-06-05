@@ -9,7 +9,7 @@ class CustomeUser(AbstractUser):
         ("perents", "Perents")
     )
     
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, unique=True)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, blank=True, null=True)
 
 class Student(models.Model):
     student_id = models.CharField(max_length=20, unique=True)
@@ -26,6 +26,7 @@ class Student(models.Model):
     address = models.TextField()
 
     guardian_name = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
     guardian_phone = models.CharField(max_length=15, blank=True, null=True)
 
     student_photo = models.ImageField(blank=True, null=True, upload_to="student_photo")
@@ -35,6 +36,17 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.student_id} - {self.full_name}"
+
+class Parent(models.Model):
+    user = models.ForeignKey(CustomeUser, on_delete=models.CASCADE )
+    guardian_name = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.guardian_name
 
 
 

@@ -202,7 +202,8 @@
                     <div class="form-group">
                         <label for="guardian-phone">Guardian Phone</label>
                         <input type="tel" id="guardian-phone" name="guardian_phone"
-                            placeholder="Guardian's Phone Number">
+                            placeholder="Guardian's Phone Number" maxlength="10">
+                        <div id="parent-status-msg" style="margin-top: 5px; font-size: 0.85em; display: none; padding: 5px 8px; border-radius: 4px; background: #fdf2e9; border: 1px solid #ffd8a8;"></div>
                     </div>
                 </div>
 
@@ -222,6 +223,40 @@
         </div>
     </div>
     <script>
+
+document.getElementById('guardian-phone').addEventListener('input', async function() {
+    const phone = this.value.trim();
+    const parentStatusDiv = document.getElementById('parent-status-msg');
+    if (!parentStatusDiv) return;
+    
+    if (phone.length >= 10) {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/parent-check/?phone=${phone}`);
+            const data = await response.json();
+            if (data.exists) {
+                parentStatusDiv.innerHTML = `<strong>✓ Parent account exists:</strong> Account found for <strong>${data.name}</strong>. Student will be linked.`;
+                parentStatusDiv.style.color = '#27ae60';
+                parentStatusDiv.style.background = '#e8f8f5';
+                parentStatusDiv.style.borderColor = '#a3e4d7';
+                parentStatusDiv.style.display = 'block';
+                const guardianNameInput = document.getElementById('guardian-name');
+                if (guardianNameInput && !guardianNameInput.value) {
+                    guardianNameInput.value = data.name;
+                }
+            } else {
+                parentStatusDiv.innerHTML = `⚠️ No parent account found. <strong>A new parent account will be created automatically.</strong>`;
+                parentStatusDiv.style.color = '#e67e22';
+                parentStatusDiv.style.background = '#fdf2e9';
+                parentStatusDiv.style.borderColor = '#ffd8a8';
+                parentStatusDiv.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Error checking parent:', err);
+        }
+    } else {
+        parentStatusDiv.style.display = 'none';
+    }
+});
 
 document.getElementById("registration-form").addEventListener("submit", async function(e){
     e.preventDefault();
@@ -248,7 +283,7 @@ document.getElementById("registration-form").addEventListener("submit", async fu
     // If access token expired
     if(response.status === 401){
 
-        const refreshResponse = await fetch("http://127.0.0.1:8000/api/token/refresh/",{
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/refresh/",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -281,7 +316,7 @@ document.getElementById("registration-form").addEventListener("submit", async fu
 
     if(response.ok){
         alert("Student Registered Successfully");
-        form.reset();
+        window.location = '/student_registration';
     }else{
         console.log(data);
         alert("Error occurred");

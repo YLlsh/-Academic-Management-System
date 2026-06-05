@@ -11,7 +11,9 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         user = self.user
 
-        if user.groups.filter(name = "clerk" ).exists():
+        if user.role:
+            data["role"] = user.role
+        elif user.groups.filter(name = "clerk" ).exists():
             data["role"] = "clerk"
         elif user.groups.filter(name = "teacher").exists():
             data["role"] = "teacher"
@@ -61,3 +63,11 @@ class Assignclass_Serializer(serializers.ModelSerializer):
             validated_data['end'] = end
             
         return Assign_class.objects.create(**validated_data)
+    
+    
+    
+    
+    
+# class GetGuidance(serializers.ModelSerializer):
+#     class Meta:
+#         model = User

@@ -63,7 +63,7 @@
 
             <!-- Dashboard -->
             <li class="menu-item">
-                <a href="#" class="menu-link" data-page="dashboard">
+                <a href="{% url 'dashboard' %}" class="menu-link" data-page="dashboard">
                     <span class="menu-icon">📊</span>
                     <span class="menu-text">Dashboard</span>
                 </a>
@@ -102,7 +102,7 @@
                         </a>
                     </li>
                     <li class="student-progress-item">
-                        <a href="#" class="submenu-link" data-page="student-progress">
+                        <a href="{% url 'progress' %}" class="submenu-link">
                             Progress
                         </a>
                     </li>

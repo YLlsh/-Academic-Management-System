@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .progress-section {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    .progress-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .progress-table th, .progress-table td {
+        padding: 14px 16px;
+        text-align: left;
+        font-size: 14px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .progress-table th {
+        background: #f4f6f8;
+        font-weight: 600;
+        color: #34495e;
+    }
+    .btn-view-progress {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background 0.3s ease;
+    }
+    .btn-view-progress:hover {
+        background: #219653;
+    }
+</style>
+
+<div class="progress-section">
+    <div class="page-header">
+        <h1>Student Progress Tracking</h1>
+        <p>Select a student to view their detailed academic and monthly progress</p>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="progress-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in student_data %}
+                <tr>
+                    <td>{{ i.student_id }}</td>
+                    <td>{{ i.full_name }}</td>
+                    <td>{{ i.student_class }}</td>
+                    <td>
+                        <a href="{% url 'student_progress_detail' i.id %}" class="btn-view-progress">View Progress</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #95a5a6; padding: 20px; font-style: italic;">
+                        No students registered yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

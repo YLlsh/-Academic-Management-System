@@ -39,12 +39,152 @@
     .btn-view-progress:hover {
         background: #219653;
     }
+
+    .btn-fill-progress {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        display: inline-block;
+        transition: background 0.3s ease;
+    }
+    .btn-fill-progress:hover {
+        background: #2563eb;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 85vh;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-container {
+        transform: scale(1);
+    }
+
+    .modal-header {
+        padding: 20px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #1e293b;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+    .modal-close:hover {
+        color: #64748b;
+    }
+
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal-footer {
+        padding: 16px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        border-color: #3b82f6;
+    }
+
+    .btn-action {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: opacity 0.2s;
+    }
+
+    .btn-action:hover {
+        opacity: 0.9;
+    }
 </style>
 
 <div class="progress-section">
     <div class="page-header">
         <h1>Student Progress Tracking</h1>
-        <p>Select a student to view their detailed academic and monthly progress</p>
+        <p>Select a student to view their detailed academic and monthly progress or record new metrics</p>
     </div>
 
     <div class="table-wrapper">
@@ -64,7 +204,10 @@
                     <td>{{ i.full_name }}</td>
                     <td>{{ i.student_class }}</td>
                     <td>
-                        <a href="{% url 'student_progress_detail' i.id %}" class="btn-view-progress">View Progress</a>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{% url 'student_progress_detail' i.id %}" class="btn-view-progress">View Progress</a>
+                            <button class="btn-fill-progress" onclick="openProgressModal('{{ i.id }}', '{{ i.full_name }}')">Fill Progress</button>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
@@ -78,4 +221,145 @@
         </table>
     </div>
 </div>
+
+<!-- Fill Progress Modal -->
+<div class="modal-overlay" id="progressModalOverlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="progressModalTitle">Fill Student Progress</h3>
+            <button class="modal-close" onclick="closeProgressModal()">&times;</button>
+        </div>
+        <form id="progressForm" onsubmit="submitProgress(event)">
+            <div class="modal-body">
+                <input type="hidden" id="progressStudentId" name="student_id">
+                
+                <div class="form-group">
+                    <label for="progressMonth">Month</label>
+                    <select id="progressMonth" name="month" required>
+                        <option value="" disabled selected>Select Month</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="progressAttendance">Attendance Percentage (e.g. 95%)</label>
+                    <input type="text" id="progressAttendance" name="attendance" placeholder="e.g. 95%" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="progressGrade">Grade (e.g. A+)</label>
+                    <input type="text" id="progressGrade" name="grade" placeholder="e.g. A+" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="progressRemarks">Performance Remarks</label>
+                    <textarea id="progressRemarks" name="remarks" rows="4" placeholder="Enter details about student's performance..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-action" style="background: #94a3b8; color: white;" onclick="closeProgressModal()">Cancel</button>
+                <button type="submit" class="btn-action" style="background: #3b82f6; color: white;">Save Progress</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modalOverlay = document.getElementById("progressModalOverlay");
+    const studentIdInput = document.getElementById("progressStudentId");
+    const modalTitle = document.getElementById("progressModalTitle");
+    const progressForm = document.getElementById("progressForm");
+
+    function openProgressModal(studentId, studentName) {
+        modalTitle.innerText = `Fill Progress - ${studentName}`;
+        studentIdInput.value = studentId;
+        progressForm.reset();
+        modalOverlay.classList.add("active");
+    }
+
+    function closeProgressModal() {
+        modalOverlay.classList.remove("active");
+    }
+
+    modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) {
+            closeProgressModal();
+        }
+    });
+
+    async function submitProgress(e) {
+        e.preventDefault();
+        
+        const studentId = document.getElementById("progressStudentId").value;
+        const month = document.getElementById("progressMonth").value;
+        const attendance = document.getElementById("progressAttendance").value;
+        const grade = document.getElementById("progressGrade").value;
+        const remarks = document.getElementById("progressRemarks").value;
+
+        let token = localStorage.getItem("access");
+        const refreshToken = localStorage.getItem("refresh");
+
+        async function performSave(tok) {
+            return fetch('/api/save-progress/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + tok
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    month: month,
+                    attendance: attendance,
+                    grade: grade,
+                    remarks: remarks
+                })
+            });
+        }
+
+        try {
+            let res = await performSave(token);
+
+            if (res.status === 401 && refreshToken) {
+                const refreshRes = await fetch('/api/refresh/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (refreshRes.ok) {
+                    const data = await refreshRes.json();
+                    token = data.access;
+                    localStorage.setItem("access", token);
+                    res = await performSave(token);
+                } else {
+                    alert("Your session has expired. Please log in again.");
+                    window.location.href = "/login/";
+                    return;
+                }
+            }
+
+            if (res.ok) {
+                alert("Progress saved successfully!");
+                closeProgressModal();
+            } else {
+                const errData = await res.json();
+                alert("Error saving progress: " + (errData.error || "Please try again."));
+            }
+        } catch (err) {
+            console.error("Save progress error:", err);
+            alert("An error occurred. Please check network connection.");
+        }
+    }
+</script>
 {% endblock %}

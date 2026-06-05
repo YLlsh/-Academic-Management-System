@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -14,8 +14,21 @@ User = get_user_model()
 from rest_framework.permissions import BasePermission
 # Create your views here.
 
+from django.contrib.auth import login as django_login
+
 class CustomeLogin(TokenObtainPairView):
     serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            username = request.data.get('username')
+            try:
+                user = User.objects.get(username=username)
+                django_login(request, user)
+            except User.DoesNotExist:
+                pass
+        return response
 
 
 class IsTeacher(BasePermission):
@@ -141,16 +154,27 @@ def progress_view(request):
 def student_progress_detail_view(request, student_id):
     try:
         student = Student.objects.get(id=student_id)
-    except Student.DoesNotExist:
+    except (Student.DoesNotExist, ValueError):
         student = Student.objects.get(student_id=student_id)
         
-    monthly_progress = [
-        {"month": "January", "attendance": "95%", "grade": "A+", "performance": "Excellent progress in science and maths."},
-        {"month": "February", "attendance": "92%", "grade": "A", "performance": "Consistent performance in all subjects."},
-        {"month": "March", "attendance": "98%", "grade": "A+", "performance": "Outstanding performance in term exams."},
-        {"month": "April", "attendance": "89%", "grade": "B+", "performance": "Needs slight improvement in literature."},
-        {"month": "May", "attendance": "94%", "grade": "A", "performance": "Very active participation in classroom activities."}
-    ]
+    db_progress = StudentProgress.objects.filter(student=student).order_by('created_at')
+    if db_progress.exists():
+        monthly_progress = []
+        for p in db_progress:
+            monthly_progress.append({
+                "month": p.month,
+                "attendance": p.attendance,
+                "grade": p.grade,
+                "performance": p.remarks
+            })
+    else:
+        monthly_progress = [
+            {"month": "January", "attendance": "95%", "grade": "A+", "performance": "Excellent progress in science and maths."},
+            {"month": "February", "attendance": "92%", "grade": "A", "performance": "Consistent performance in all subjects."},
+            {"month": "March", "attendance": "98%", "grade": "A+", "performance": "Outstanding performance in term exams."},
+            {"month": "April", "attendance": "89%", "grade": "B+", "performance": "Needs slight improvement in literature."},
+            {"month": "May", "attendance": "94%", "grade": "A", "performance": "Very active participation in classroom activities."}
+        ]
     return render(request, 'student_progress.html', {
         'student': student,
         'monthly_progress': monthly_progress
@@ -169,6 +193,33 @@ class ParentStudentsAPI(APIView):
         
         student_list = []
         for s in students:
+            # Calculate dynamic overall attendance from database Attendance records
+            total_days = Attendance.objects.filter(student=s).count()
+            if total_days > 0:
+                present_days = Attendance.objects.filter(student=s, status='Present').count()
+                attendance_pct = f"{int((present_days / total_days) * 100)}%"
+            else:
+                attendance_pct = "94%"  # fallback
+                
+            db_progress = StudentProgress.objects.filter(student=s).order_by('created_at')
+            if db_progress.exists():
+                progress_list = []
+                for p in db_progress:
+                    progress_list.append({
+                        "month": p.month,
+                        "attendance": p.attendance,
+                        "grade": p.grade,
+                        "remarks": p.remarks
+                    })
+            else:
+                progress_list = [
+                    {"month": "January", "attendance": "95%", "grade": "A+", "remarks": "Excellent progress."},
+                    {"month": "February", "attendance": "92%", "grade": "A", "remarks": "Consistently good."},
+                    {"month": "March", "attendance": "98%", "grade": "A+", "remarks": "Outstanding exam score."},
+                    {"month": "April", "attendance": "89%", "grade": "B+", "remarks": "Needs focus on biology."},
+                    {"month": "May", "attendance": "94%", "grade": "A", "remarks": "Good overall results."}
+                ]
+                
             student_list.append({
                 "id": s.id,
                 "student_id": s.student_id,
@@ -177,16 +228,156 @@ class ParentStudentsAPI(APIView):
                 "course": s.course or "-",
                 "email": s.email,
                 "phone": s.phone,
-                "attendance": "94%",
-                "grade": "A",
+                "attendance": attendance_pct,
+                "grade": progress_list[-1]['grade'] if progress_list else "A",
                 "teacher": "Mr. Sharma (Maths)",
-                "progress": [
-                    {"month": "January", "attendance": "95%", "grade": "A+", "remarks": "Excellent progress."},
-                    {"month": "February", "attendance": "92%", "grade": "A", "remarks": "Consistently good."},
-                    {"month": "March", "attendance": "98%", "grade": "A+", "remarks": "Outstanding exam score."},
-                    {"month": "April", "attendance": "89%", "grade": "B+", "remarks": "Needs focus on biology."},
-                    {"month": "May", "attendance": "94%", "grade": "A", "remarks": "Good overall results."}
-                ]
+                "progress": progress_list
             })
         return Response(student_list)
+
+
+def attendance_view(request):
+    student_data = Student.objects.all().order_by('-created_at')
+    return render(request, 'attendance.html', {'student_data': student_data})
+
+
+from rest_framework.decorators import api_view, permission_classes
+from datetime import date, datetime
+
+def teacher_page_view(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+    try:
+        teacher = Teacher.objects.get(user=request.user)
+    except Teacher.DoesNotExist:
+        if request.user.is_superuser or request.user.role == 'admin':
+            teacher = Teacher.objects.first()
+            if not teacher:
+                user_u = User.objects.filter(role='teacher').first()
+                if not user_u:
+                    user_u = request.user
+                teacher = Teacher.objects.create(
+                    teacher_id="TCH001",
+                    user=user_u,
+                    full_name="Admin Teacher",
+                    email="admin_teacher@example.com",
+                    phone="1234567890",
+                    date_of_joining=date.today(),
+                    gender="male",
+                    department="computer",
+                    qualification="Master",
+                    address="School Campus"
+                )
+        else:
+            return redirect('login')
+            
+    today_date = date.today()
+    assigned_classes = Assign_class.objects.filter(teacher=teacher, for_date=today_date).order_by('start')
+    
+    return render(request, 'teacher_page.html', {
+        'teacher': teacher,
+        'assigned_classes': assigned_classes,
+        'today_date': today_date
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def class_students_api(request):
+    class_name = request.GET.get('class_name')
+    if not class_name:
+        return Response({"error": "class_name parameter is required"}, status=400)
+        
+    students = Student.objects.filter(student_class=class_name).order_by('full_name')
+    today_date = date.today()
+    
+    student_list = []
+    for s in students:
+        att_record = Attendance.objects.filter(student=s, date=today_date).first()
+        status = att_record.status if att_record else None
+        
+        student_list.append({
+            "id": s.id,
+            "student_id": s.student_id,
+            "full_name": s.full_name,
+            "student_photo": s.student_photo.url if s.student_photo else None,
+            "today_status": status
+        })
+        
+    return Response(student_list)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_attendance_api(request):
+    attendance_data = request.data.get('attendance')
+    date_str = request.data.get('date')
+    
+    if not attendance_data:
+        return Response({"error": "attendance data is required"}, status=400)
+        
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({"error": "invalid date format, use YYYY-MM-DD"}, status=400)
+    else:
+        target_date = date.today()
+        
+    saved_count = 0
+    for record in attendance_data:
+        student_id = record.get('student_id')
+        status = record.get('status')
+        if not student_id or not status:
+            continue
+            
+        try:
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            continue
+            
+        Attendance.objects.update_or_create(
+            student=student,
+            date=target_date,
+            defaults={'status': status}
+        )
+        saved_count += 1
+        
+    return Response({"message": f"Successfully saved attendance for {saved_count} students.", "date": str(target_date)})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_progress_api(request):
+    student_id = request.data.get('student_id')
+    month = request.data.get('month')
+    attendance = request.data.get('attendance')
+    grade = request.data.get('grade')
+    remarks = request.data.get('remarks')
+    
+    if not all([student_id, month, attendance, grade, remarks]):
+        return Response({"error": "All fields (student_id, month, attendance, grade, remarks) are required"}, status=400)
+        
+    try:
+        student = Student.objects.get(id=student_id)
+    except Student.DoesNotExist:
+        return Response({"error": "Student not found"}, status=404)
+        
+    progress, created = StudentProgress.objects.update_or_create(
+        student=student,
+        month=month,
+        defaults={
+            'attendance': attendance,
+            'grade': grade,
+            'remarks': remarks
+        }
+    )
+    
+    return Response({
+        "message": "Progress recorded successfully",
+        "progress_id": progress.id,
+        "created": created
+    })
+
 

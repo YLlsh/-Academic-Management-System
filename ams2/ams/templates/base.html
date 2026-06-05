@@ -32,6 +32,16 @@
         .role-admin .faculty-list-item {
             display: block !important;
         }
+
+        /* Show teacher-specific items and hide clerk/admin modules */
+        .role-teacher .student-progress-item {
+            display: block !important;
+        }
+        .role-teacher .faculty-module,
+        .role-teacher .course-module,
+        .role-teacher .admin-module {
+            display: none !important;
+        }
     </style>
 </head>
 <body>

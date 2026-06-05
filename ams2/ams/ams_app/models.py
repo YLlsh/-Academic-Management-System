@@ -100,4 +100,26 @@ class Assign_class(models.Model):
     end = models.TimeField()
     for_date = models.DateField()
     create_at = models.DateTimeField(auto_now_add=True)
+
+
+class Attendance(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendance_records')
+    date = models.DateField()
+    status = models.CharField(max_length=10) # "Present" or "Absent"
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.date} ({self.status})"
+
+
+class StudentProgress(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='progress_records')
+    month = models.CharField(max_length=20)
+    attendance = models.CharField(max_length=10) # e.g. "95%"
+    grade = models.CharField(max_length=10) # e.g. "A+"
+    remarks = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.month}"
     

@@ -1,195 +1,541 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>EduManage - Teacher Dashboard</title>
-<link rel="stylesheet" href="teacher.css">
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 <style>
-    body{
-margin:0;
-font-family:Arial;
-background:#f4f6f9;
-}
+    .teacher-dashboard {
+        padding: 10px;
+    }
+    
+    .teacher-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .teacher-card h2 {
+        margin-top: 0;
+        font-size: 18px;
+        color: #1e293b;
+        border-bottom: 2px solid #f1f5f9;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .class-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .class-info h3 {
+        margin: 0 0 6px 0;
+        font-size: 15px;
+        color: #3b82f6;
+    }
+    
+    .class-info p {
+        margin: 4px 0;
+        font-size: 13px;
+        color: #64748b;
+    }
+    
+    .actions-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .btn-action {
+        background: #3b82f6;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: background 0.2s ease, transform 0.1s ease;
+    }
+    
+    .btn-action:hover {
+        background: #2563eb;
+    }
 
-/* Navbar */
+    .btn-action:active {
+        transform: scale(0.98);
+    }
+    
+    .btn-take-attendance {
+        background: #10b981;
+    }
+    
+    .btn-take-attendance:hover {
+        background: #059669;
+    }
 
-.navbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px 40px;
-background:#2c3e50;
-color:white;
-}
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
 
-.logo{
-font-size:22px;
-font-weight:bold;
-color:#6fa8ff;
-}
+    .modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
 
-.nav-links{
-list-style:none;
-display:flex;
-gap:25px;
-}
+    .modal-container {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 650px;
+        max-height: 85vh;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
 
-.nav-links a{
-text-decoration:none;
-color:white;
-}
+    .modal-overlay.active .modal-container {
+        transform: scale(1);
+    }
 
-.nav-links a:hover{
-color:#6fa8ff;
-}
+    .modal-header {
+        padding: 20px 24px;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.logout-btn{
-background:#4a90e2;
-border:none;
-padding:8px 16px;
-color:white;
-border-radius:6px;
-cursor:pointer;
-}
+    .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #1e293b;
+    }
 
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
 
-/* Container */
+    .modal-close:hover {
+        color: #64748b;
+    }
 
-.container{
-width:80%;
-margin:40px auto;
-}
+    .modal-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex-grow: 1;
+    }
 
+    .modal-footer {
+        padding: 16px 24px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
 
-/* Cards */
+    /* Student List Styling inside Modal */
+    .student-attendance-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
-.card{
-background:white;
-padding:25px;
-border-radius:10px;
-margin-bottom:25px;
-box-shadow:0 3px 8px rgba(0,0,0,0.1);
-}
+    .student-attendance-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: background 0.2s;
+    }
 
+    .student-attendance-row:hover {
+        background: #f1f5f9;
+    }
 
-/* Class Box */
+    .student-info-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-.class-box{
-background:#eef3ff;
-padding:15px;
-border-radius:8px;
-margin-top:10px;
-}
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1.5px solid #cbd5e1;
+    }
 
+    .student-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: #475569;
+    }
 
-/* Quick Actions */
+    .student-details h4 {
+        margin: 0;
+        font-size: 14px;
+        color: #1e293b;
+    }
 
-.actions{
-display:flex;
-gap:15px;
-margin-top:10px;
-}
+    .student-details span {
+        font-size: 11px;
+        color: #64748b;
+    }
 
-.actions button{
-background:#4a90e2;
-border:none;
-color:white;
-padding:10px 18px;
-border-radius:6px;
-cursor:pointer;
-}
+    /* Attendance Toggle Buttons */
+    .attendance-toggle-group {
+        display: flex;
+        background: #e2e8f0;
+        padding: 2px;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+    }
 
-.actions button:hover{
-background:#357bd8;
-}
+    .attendance-toggle-label {
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+    }
+
+    .attendance-toggle-input {
+        display: none;
+    }
+
+    /* Present Checked Style */
+    .attendance-toggle-input[value="Present"]:checked + .attendance-toggle-label {
+        background: #10b981;
+        color: white;
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Absent Checked Style */
+    .attendance-toggle-input[value="Absent"]:checked + .attendance-toggle-label {
+        background: #ef4444;
+        color: white;
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+    }
+
+    .attendance-toggle-label:hover {
+        opacity: 0.9;
+    }
 </style>
-</head>
 
-<body>
+<div class="teacher-dashboard">
+    <div class="page-header" style="margin-bottom: 25px;">
+        <h1>Welcome {{ teacher.full_name }} 👋</h1>
+        <p style="color: #64748b; font-size: 14px;">Manage your daily schedule, student classes, and attendance records</p>
+    </div>
 
-<!-- Navbar -->
-<nav class="navbar">
+    <!-- Date Card -->
+    <div class="teacher-card">
+        <h2>Today's Date</h2>
+        <p id="todayDate" style="font-size: 16px; font-weight: 600; color: #334155; margin: 0;"></p>
+    </div>
 
-<div class="logo">EduManage</div>
+    <!-- Today's Assigned Classes (Dynamic) -->
+    <div class="teacher-card">
+        <h2>Today's Class Schedule</h2>
+        <div id="today-classes-container">
+            {% for item in assigned_classes %}
+            <div class="class-box" id="class-box-{{ item.id }}">
+                <div class="class-info">
+                    <h3>{{ item.class_name }}</h3>
+                    <p><strong>Time:</strong> {{ item.start|time:"h:i A" }} - {{ item.end|time:"h:i A" }}</p>
+                    <p><strong>Date:</strong> {{ item.for_date }}</p>
+                </div>
+                <button class="btn-action btn-take-attendance" onclick="openAttendanceModal('{{ item.class_name }}')">
+                    Take Attendance
+                </button>
+            </div>
+            {% empty %}
+            <p style="color: #94a3b8; font-style: italic; margin: 15px 0;">No classes assigned to you for today.</p>
+            {% endfor %}
+        </div>
+    </div>
 
-<ul class="nav-links">
-<li><a href="#">Home</a></li>
-<li><a href="#">My Classes</a></li>
-<li><a href="#">Assignments</a></li>
-<li><a href="#">Students</a></li>
-<li><a href="#">Profile</a></li>
-</ul>
-
-<button class="logout-btn">Logout</button>
-
-</nav>
-
-
-<!-- Main Content -->
-<div class="container">
-
-<h1>Welcome Teacher 👋</h1>
-
-<!-- Date Card -->
-<div class="card">
-<h2>Today's Date</h2>
-<p id="todayDate"></p>
+    <!-- Quick Actions -->
+    <div class="teacher-card">
+        <h2>Quick Actions</h2>
+        <div class="actions-container">
+            <button class="btn-action" onclick="window.location.href='{% url 'attendance' %}'">View Attendance Info</button>
+            <button class="btn-action" onclick="window.location.href='{% url 'student_registration' %}'">View Students List</button>
+            <button class="btn-action" onclick="window.location.href='{% url 'progress' %}'">Track Student Progress</button>
+        </div>
+    </div>
 </div>
 
-
-<!-- Tomorrow Schedule -->
-<div class="card">
-
-<h2>Tomorrow's Classes</h2>
-
-<div class="class-box">
-<h3>Mathematics - Class 10A</h3>
-<p>Time : 09:00 AM - 10:00 AM</p>
-<p>Room : 204</p>
+<!-- Take Attendance Modal -->
+<div class="modal-overlay" id="attendanceModalOverlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="attendanceModalTitle">Take Attendance</h3>
+            <button class="modal-close" onclick="closeAttendanceModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-loader" style="text-align: center; padding: 20px; color: #64748b;">
+                <p>Loading students...</p>
+            </div>
+            <div id="modal-error" style="text-align: center; padding: 20px; color: #ef4444; display: none;">
+                <p>Failed to load students. Please try again.</p>
+            </div>
+            <form id="attendanceForm" onsubmit="submitAttendance(event)">
+                <input type="hidden" id="attendanceClassName" name="class_name">
+                <div class="student-attendance-list" id="studentListContainer">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-action" style="background: #94a3b8;" onclick="closeAttendanceModal()">Cancel</button>
+            <button type="submit" form="attendanceForm" class="btn-action" style="background: #10b981;">Save Attendance</button>
+        </div>
+    </div>
 </div>
 
-<div class="class-box">
-<h3>Physics - Class 11B</h3>
-<p>Time : 11:00 AM - 12:00 PM</p>
-<p>Room : 301</p>
-</div>
-
-</div>
-
-
-<!-- Quick Actions -->
-<div class="card">
-
-<h2>Quick Actions</h2>
-
-<div class="actions">
-
-<button>Take Attendance</button>
-<button>Add Assignment</button>
-<button>View Students</button>
-
-</div>
-
-</div>
-
-
-</div>
-
-<script src="teacher.js"></script>
 <script>
-
     const today = new Date();
+    const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+    document.getElementById("todayDate").innerText = today.toLocaleDateString("en-IN", options);
 
-const options = {
-weekday: 'long',
-year: 'numeric',
-month: 'long',
-day: 'numeric'
-};
+    // Modal Control Functions
+    const modalOverlay = document.getElementById("attendanceModalOverlay");
+    const loader = document.getElementById("modal-loader");
+    const errorEl = document.getElementById("modal-error");
+    const listContainer = document.getElementById("studentListContainer");
+    const classNameInput = document.getElementById("attendanceClassName");
+    const modalTitle = document.getElementById("attendanceModalTitle");
 
-document.getElementById("todayDate").innerText =
-today.toLocaleDateString("en-IN", options);
+    function openAttendanceModal(className) {
+        modalTitle.innerText = `Take Attendance - ${className}`;
+        classNameInput.value = className;
+        
+        // Reset modal state
+        listContainer.innerHTML = "";
+        loader.style.display = "block";
+        errorEl.style.display = "none";
+        
+        // Show modal overlay
+        modalOverlay.classList.add("active");
+        
+        // Fetch students
+        fetchClassStudents(className);
+    }
+
+    function closeAttendanceModal() {
+        modalOverlay.classList.remove("active");
+    }
+
+    // Close modal if clicking outside of the container
+    modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) {
+            closeAttendanceModal();
+        }
+    });
+
+    // Fetch class students
+    async function fetchClassStudents(className) {
+        let token = localStorage.getItem("access");
+        const refreshToken = localStorage.getItem("refresh");
+
+        async function performFetch(tok) {
+            return fetch(`/api/class-students/?class_name=${encodeURIComponent(className)}`, {
+                headers: {
+                    "Authorization": "Bearer " + tok
+                }
+            });
+        }
+
+        try {
+            let res = await performFetch(token);
+
+            if (res.status === 401 && refreshToken) {
+                // Token refresh
+                const refreshRes = await fetch('/api/refresh/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (refreshRes.ok) {
+                    const data = await refreshRes.json();
+                    token = data.access;
+                    localStorage.setItem("access", token);
+                    res = await performFetch(token);
+                } else {
+                    alert("Your session has expired. Please log in again.");
+                    window.location.href = "/login/";
+                    return;
+                }
+            }
+
+            if (res.ok) {
+                const students = await res.json();
+                loader.style.display = "none";
+                
+                if (students.length === 0) {
+                    listContainer.innerHTML = `<p style="text-align: center; color: #94a3b8; font-style: italic; padding: 20px;">No students registered in this class.</p>`;
+                    return;
+                }
+
+                students.forEach((student, index) => {
+                    // prefilled status
+                    const isPresent = student.today_status === "Present" || student.today_status === null; // default to Present
+                    const isAbsent = student.today_status === "Absent";
+                    
+                    const avatarHTML = student.student_photo 
+                        ? `<img src="${student.student_photo}" class="student-avatar" alt="${student.full_name}">`
+                        : `<div class="student-avatar-placeholder">👤</div>`;
+
+                    const rowHTML = `
+                        <div class="student-attendance-row">
+                            <div class="student-info-meta">
+                                ${avatarHTML}
+                                <div class="student-details">
+                                    <h4>${student.full_name}</h4>
+                                    <span>ID: ${student.student_id}</span>
+                                </div>
+                            </div>
+                            <div class="attendance-toggle-group">
+                                <input type="radio" id="pres-${student.id}" name="attendance-${student.id}" value="Present" class="attendance-toggle-input" ${isPresent ? 'checked' : ''} data-student-id="${student.id}">
+                                <label for="pres-${student.id}" class="attendance-toggle-label">Present</label>
+                                
+                                <input type="radio" id="abs-${student.id}" name="attendance-${student.id}" value="Absent" class="attendance-toggle-input" ${isAbsent ? 'checked' : ''} data-student-id="${student.id}">
+                                <label for="abs-${student.id}" class="attendance-toggle-label">Absent</label>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.insertAdjacentHTML('beforeend', rowHTML);
+                });
+            } else {
+                loader.style.display = "none";
+                errorEl.style.display = "block";
+            }
+        } catch (err) {
+            console.error("Fetch students error:", err);
+            loader.style.display = "none";
+            errorEl.style.display = "block";
+        }
+    }
+
+    // Submit Attendance
+    async function submitAttendance(e) {
+        e.preventDefault();
+        
+        const inputs = listContainer.querySelectorAll('.attendance-toggle-input:checked');
+        const attendanceRecords = [];
+        
+        inputs.forEach(input => {
+            attendanceRecords.push({
+                student_id: parseInt(input.getAttribute('data-student-id')),
+                status: input.value
+            });
+        });
+
+        if (attendanceRecords.length === 0) {
+            alert("No student records found to save.");
+            return;
+        }
+
+        let token = localStorage.getItem("access");
+        const refreshToken = localStorage.getItem("refresh");
+
+        async function performSave(tok) {
+            return fetch('/api/save-attendance/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + tok
+                },
+                body: JSON.stringify({
+                    attendance: attendanceRecords
+                })
+            });
+        }
+
+        try {
+            let res = await performSave(token);
+
+            if (res.status === 401 && refreshToken) {
+                // Token refresh
+                const refreshRes = await fetch('/api/refresh/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refresh: refreshToken })
+                });
+
+                if (refreshRes.ok) {
+                    const data = await refreshRes.json();
+                    token = data.access;
+                    localStorage.setItem("access", token);
+                    res = await performSave(token);
+                } else {
+                    alert("Your session has expired. Please log in again.");
+                    window.location.href = "/login/";
+                    return;
+                }
+            }
+
+            if (res.ok) {
+                alert("Attendance saved successfully!");
+                closeAttendanceModal();
+            } else {
+                const errData = await res.json();
+                alert("Error saving attendance: " + (errData.error || "Please try again."));
+            }
+        } catch (err) {
+            console.error("Save attendance error:", err);
+            alert("An error occurred. Please check network connection.");
+        }
+    }
 </script>
-
-</body>
-</html>
+{% endblock %}

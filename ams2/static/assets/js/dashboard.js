@@ -61,4 +61,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ===============================
+       AUTO-EXPAND AND HIGHLIGHT ACTIVE MENU
+       =============================== */
+    const currentPath = window.location.pathname.replace(/\/$/, "") || "/";
+    document.querySelectorAll(".sidebar-menu a").forEach(link => {
+        if (link.href) {
+            const linkPath = new URL(link.href, window.location.origin).pathname.replace(/\/$/, "") || "/";
+            if (linkPath === currentPath) {
+                link.classList.add("active");
+                // If it is inside a submenu, open the parent module
+                const parentModule = link.closest(".menu-item");
+                if (parentModule) {
+                    parentModule.classList.add("active");
+                }
+            }
+        }
+    });
+
 });

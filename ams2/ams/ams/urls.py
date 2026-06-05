@@ -36,9 +36,9 @@ urlpatterns = [
     path('api/refresh/',TokenRefreshView.as_view(),name='refresh'),
 
     path("login/", TemplateView.as_view(template_name='login.html'), name="login"),
-    path("dashboard", TemplateView.as_view(template_name='dashbaord.html'), name="dashboard"),
-    path("teacher_page", TemplateView.as_view(template_name='teacher_page.html'), name="teacher_page"),
-    path("attendance", TemplateView.as_view(template_name='attendance.html'), name="attendance"),
+    path("", TemplateView.as_view(template_name='dashbaord.html'), name="dashboard"),
+    path("teacher_page", teacher_page_view, name="teacher_page"),
+    path("attendance", attendance_view, name="attendance"),
     path("student_page", TemplateView.as_view(template_name='student_page.html'), name="student_page"),
     # path("student_attendance/", student_attendance, name="student_attendance"),
     path("teacher_regi/", teacher_regi_view, name="teacher_regi"),
@@ -51,7 +51,11 @@ urlpatterns = [
     path('student_progress/<int:student_id>/', student_progress_detail_view, name='student_progress_detail'),
     
     path('parent_page/', TemplateView.as_view(template_name='parent_page.html'), name='parent_page'),
-    path('api/parent-students/', ParentStudentsAPI.as_view(), name='parent_students_api')
+    path('api/parent-students/', ParentStudentsAPI.as_view(), name='parent_students_api'),
+    
+    path('api/class-students/', class_students_api, name='class_students_api'),
+    path('api/save-attendance/', save_attendance_api, name='save_attendance_api'),
+    path('api/save-progress/', save_progress_api, name='save_progress_api')
 ]
 # urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
 if settings.DEBUG:

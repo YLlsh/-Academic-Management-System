@@ -6,6 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Academic Management System</title>
     <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <style>
+        /* Default styling: hide admin-specific items for non-admin roles */
+        .student-progress-item,
+        .faculty-attendance-item,
+        .faculty-list-item {
+            display: none !important;
+        }
+
+        /* Styling when role-admin is active on body: hide clerk-specific items */
+        .role-admin .course-module,
+        .role-admin .admin-only,
+        .role-admin .admin-module,
+        .role-admin .student-reg-item,
+        .role-admin .student-exam-item,
+        .role-admin .faculty-reg-item,
+        .role-admin .faculty-assignments-item,
+        .role-admin .faculty-grades-item {
+            display: none !important;
+        }
+
+        /* Show admin-specific items when admin is logged in */
+        .role-admin .student-progress-item,
+        .role-admin .faculty-attendance-item,
+        .role-admin .faculty-list-item {
+            display: block !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Main Dashboard -->
@@ -43,7 +70,7 @@
             </li>
 
             <!-- Student Module -->
-            <li class="menu-item">
+            <li class="menu-item student-module">
                 <div class="menu-link module-toggle" data-module="student">
                     <span class="menu-icon">👨‍🎓</span>
                     <span class="menu-text">Student Module</span>
@@ -51,19 +78,36 @@
                 </div>
 
                 <ul class="submenu" data-submenu="student">
-                    <li>
+                    <li class="student-reg-item">
                         <a href="{% url 'student_registration' %}" class="submenu-link">
                             Student Registration
                         </a>
                     </li>
-                    <li><a href="#" class="submenu-link" data-page="student-attendance">Attendance</a></li>
-                    <li><a href="#" class="submenu-link" data-page="student-examination">Examination</a></li>
-                    <li><a href="#" class="submenu-link" data-page="student-list">Student List</a></li>
+                    <li class="student-attendance-item">
+                        <a href="{% url 'attendance' %}" class="submenu-link">
+                            Attendance Info
+                        </a>
+                    </li>
+                    <li class="student-exam-item">
+                        <a href="#" class="submenu-link" data-page="student-examination">
+                            Examination
+                        </a>
+                    </li>
+                    <li class="student-list-item">
+                        <a href="{% url 'student_registration' %}" class="submenu-link">
+                            Student List
+                        </a>
+                    </li>
+                    <li class="student-progress-item">
+                        <a href="#" class="submenu-link" data-page="student-progress">
+                            Progress
+                        </a>
+                    </li>
                 </ul>
             </li>
 
             <!-- Faculty Module -->
-             <li class="menu-item">
+             <li class="menu-item faculty-module">
                 <div class="menu-link module-toggle" data-module="faculty">
                     <span class="menu-icon">👨‍🏫</span>
                     <span class="menu-text">Faculty Module</span>
@@ -71,15 +115,41 @@
                 </div>
 
                 <ul class="submenu" data-submenu="faculty">
-                    <li><a href="{% url 'teacher_regi' %}" class="submenu-link" data-page="faculty-list">Faculty Registration</a></li>
-                    <li><a href="{% url 'assign_class' %}" class="submenu-link" data-page="faculty-list">Assign Class</a></li>
-                    <li><a href="#" class="submenu-link" data-page="faculty-assignments">Assignments</a></li>
-                    <li><a href="#" class="submenu-link" data-page="faculty-grades">Grade Management</a></li>
+                    <li class="faculty-reg-item">
+                        <a href="{% url 'teacher_regi' %}" class="submenu-link">
+                            Faculty Registration
+                        </a>
+                    </li>
+                    <li class="faculty-list-item">
+                        <a href="{% url 'teacher_regi' %}" class="submenu-link">
+                            Faculty List
+                        </a>
+                    </li>
+                    <li class="faculty-assign-item">
+                        <a href="{% url 'assign_class' %}" class="submenu-link">
+                            Assign Class
+                        </a>
+                    </li>
+                    <li class="faculty-assignments-item">
+                        <a href="#" class="submenu-link" data-page="faculty-assignments">
+                            Assignments
+                        </a>
+                    </li>
+                    <li class="faculty-grades-item">
+                        <a href="#" class="submenu-link" data-page="faculty-grades">
+                            Grade Management
+                        </a>
+                    </li>
+                    <li class="faculty-attendance-item">
+                        <a href="{% url 'attendance' %}" class="submenu-link">
+                            Attendance Info
+                        </a>
+                    </li>
                 </ul>
             </li>
 
             <!-- Course Module -->
-            <li class="menu-item">
+            <li class="menu-item course-module">
                 <div class="menu-link module-toggle" data-module="course">
                     <span class="menu-icon">📚</span>
                     <span class="menu-text">Course Module</span>
@@ -100,7 +170,7 @@
            
 
             <!-- Admin Module -->
-            <li class="menu-item admin-only">
+            <li class="menu-item admin-module">
                 <div class="menu-link module-toggle" data-module="admin">
                     <span class="menu-icon">⚙️</span>
                     <span class="menu-text">Admin Module</span>
@@ -138,6 +208,24 @@
             const role = localStorage.getItem('role');
             document.getElementById('role').textContent = role;
             console.log(role)
+            if (role) {
+                document.body.className = 'role-' + role;
+                const roleDisplay = document.getElementById('current-role-display');
+                if (roleDisplay) {
+                    roleDisplay.textContent = role;
+                }
+            }
+
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('access');
+                    localStorage.removeItem('refresh');
+                    localStorage.removeItem('role');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/login/';
+                });
+            }
         
             var userData = {
                 name: '{{ user_name }}',

@@ -15,16 +15,15 @@ class CustomeLogin(TokenObtainPairView):
     serializer_class = LoginSerializer
 
 
-
 class IsTeacher(BasePermission):
     def has_permission(self, request, view):
         if request.user.groups.filter(name = 'teacher'):
             return super().has_permission(request, view)
     
 
-class IsCLerk(BasePermission):
+class IsParent(BasePermission):
     def has_permission(self, request, view):
-        if request.user.groups.filter(name = 'clerk'):
+        if request.user.groups.filter(name = 'parent'):
             return super().has_permission(request, view)
 
 class Student_view(ModelViewSet):
@@ -49,7 +48,7 @@ class Teacher_view(ModelViewSet):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
     # http_method_names = ['POST','GET']
-    permission_classes = [IsAuthenticated,IsCLerk]  
+    permission_classes = [IsAuthenticated,IsParent]  
 
     def perform_create(self, serializer):
         name = serializer.validated_data.get('full_name')
@@ -64,8 +63,18 @@ class Teacher_view(ModelViewSet):
 class AssignClassView(ModelViewSet):
     queryset = Assign_class.objects.all()
     serializer_class = Assignclass_Serializer
-    permission_classes = [IsAuthenticated,IsCLerk]
+    permission_classes = [IsAuthenticated,IsParent]
     http_method_names = ["post","get"]
+
+
+def student_registration_view(request):
+    student_data = Student.objects.all().order_by('-created_at')
+    return render(request, 'student_regi.html', {'student_data': student_data})
+
+
+def teacher_regi_view(request):
+    teacher_data = Teacher.objects.all().order_by('-created_at')
+    return render(request, 'teacher_regi.html', {'teacher_data': teacher_data})
 
     
     

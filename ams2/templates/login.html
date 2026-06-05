@@ -86,7 +86,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
                 window.location.href = "/teacher_page";
                 
             }
-            else if (data.role === 'clerk' ){
+            else if (data.role === 'clerk' || data.role === 'admin' ){
                 window.location.href = "/";
             }
             else if (data.role === 'student'){

@@ -15,9 +15,9 @@ class LoginSerializer(TokenObtainPairSerializer):
             data["role"] = "clerk"
         elif user.groups.filter(name = "teacher").exists():
             data["role"] = "teacher"
-        else:
-            data["role"] = "student"
-        
+        elif user.groups.filter(name = "admin").exists():
+            data["role"] = "admin"
+
         return data
      
 

@@ -23,7 +23,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import include
 router = DefaultRouter()
 
-router.register('Student_view',Student_view,basename='Student_view')
+router.register('c',Student_view,basename='Student_view')
 router.register('Teacher_view',Teacher_view,basename='Teacher_view')
 router.register('AssignClassView',AssignClassView,basename='AssignClassView')
 
@@ -39,10 +39,10 @@ urlpatterns = [
     path("attendance", TemplateView.as_view(template_name='attendance.html'), name="attendance"),
     path("student_page", TemplateView.as_view(template_name='student_page.html'), name="student_page"),
     # path("student_attendance/", student_attendance, name="student_attendance"),
-    path("teacher_regi/", TemplateView.as_view(template_name='teacher_regi.html'), name="teacher_regi"),
+    path("teacher_regi/", teacher_regi_view, name="teacher_regi"),
     path("assign_class/", TemplateView.as_view(template_name='assign_class.html'), name="assign_class"),
 
-    path('student_registration',TemplateView.as_view(template_name='student_regi.html'), name='student_registration')
+    path('student_registration', student_registration_view, name='student_registration')
 
 ]
 

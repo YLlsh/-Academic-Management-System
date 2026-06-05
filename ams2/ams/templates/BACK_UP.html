@@ -1,0 +1,490 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Academic Management System</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+<body>
+    <!-- Main Dashboard -->
+    <div class="main-dashboard" data-dashboard-page="true">
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="top-nav-content">
+                <div class="logo">
+                    <h2>EduManage</h2>
+                </div>
+                <div class="user-info">
+                    <span class="current-user" id="current-user-display">User</span>
+                    <span class="current-role" id="current-role-display">Role</span>
+                    <button class="btn btn-secondary btn-sm" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Modules</h3>
+                <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-page="dashboard">
+                            <span class="menu-icon">📊</span>
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-module="student">
+                            <span class="menu-icon">👨‍🎓</span>
+                            <span class="menu-text">Student Module</span>
+                            <span class="menu-arrow">▼</span>
+                        </a>
+                        <ul class="submenu" data-submenu="student">
+                            <li><a href="#" class="submenu-link" data-page="student-registration">Registration</a></li>
+                            <li><a href="#" class="submenu-link" data-page="student-attendance">Attendance</a></li>
+                            <li><a href="#" class="submenu-link" data-page="student-examination">Examination</a></li>
+                            <li><a href="#" class="submenu-link" data-page="student-list">Student List</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-module="course">
+                            <span class="menu-icon">📚</span>
+                            <span class="menu-text">Course Module</span>
+                            <span class="menu-arrow">▼</span>
+                        </a>
+                        <ul class="submenu" data-submenu="course">
+                            <li><a href="#" class="submenu-link" data-page="course-list">All Courses</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-computer-science">Computer Science</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-engineering">Engineering</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-business">Business</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-medicine">Medicine</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-arts">Arts & Humanities</a></li>
+                            <li><a href="#" class="submenu-link" data-page="course-science">Natural Sciences</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-module="faculty">
+                            <span class="menu-icon">👨‍🏫</span>
+                            <span class="menu-text">Faculty Module</span>
+                            <span class="menu-arrow">▼</span>
+                        </a>
+                        <ul class="submenu" data-submenu="faculty">
+                            <li><a href="#" class="submenu-link" data-page="faculty-list">Faculty List</a></li>
+                            <li><a href="#" class="submenu-link" data-page="faculty-assignments">Assignments</a></li>
+                            <li><a href="#" class="submenu-link" data-page="faculty-grades">Grade Management</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item admin-only">
+                        <a href="#" class="menu-link" data-module="admin">
+                            <span class="menu-icon">⚙️</span>
+                            <span class="menu-text">Admin Module</span>
+                            <span class="menu-arrow">▼</span>
+                        </a>
+                        <ul class="submenu" data-submenu="admin">
+                            <li><a href="#" class="submenu-link" data-page="admin-users">User Management</a></li>
+                            <li><a href="#" class="submenu-link" data-page="admin-settings">System Settings</a></li>
+                            <li><a href="#" class="submenu-link" data-page="admin-reports">Reports & Analytics</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" data-dashboard-page="true">
+            <div class="content-wrapper">
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page-content active">
+                    <div class="page-header">
+                        <h1>Dashboard</h1>
+                        <p>Welcome to Academic Management System</p>
+                    </div>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">👨‍🎓</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-students-count">0</h3>
+                                <p>Total Students</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <h3>6</h3>
+                                <p>Active Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👨‍🏫</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-faculty-count">0</h3>
+                                <p>Faculty Members</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-attendance-percent">0%</h3>
+                                <p>Average Attendance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Module Pages -->
+                
+
+                <div id="page-student-attendance" class="page-content">
+                    <div class="page-header">
+                        <h1>Student Attendance</h1>
+                        <p>Track and manage student attendance records</p>
+                    </div>
+                    <div class="attendance-content">
+                        <div class="attendance-filters">
+                            <div class="filter-group">
+                                <label for="attendance-date">Select Date *</label>
+                                <input type="date" id="attendance-date" name="attendance-date" required>
+                            </div>
+                            <div class="filter-group">
+                                <label for="attendance-course">Select Course *</label>
+                                <select id="attendance-course" name="attendance-course" required>
+                                    <option value="">Select Course</option>
+                                    <option value="computer-science">Computer Science</option>
+                                    <option value="engineering">Engineering</option>
+                                    <option value="business">Business Administration</option>
+                                    <option value="medicine">Medicine</option>
+                                    <option value="arts">Arts & Humanities</option>
+                                    <option value="science">Natural Sciences</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="attendance-semester">Semester *</label>
+                                <select id="attendance-semester" name="attendance-semester" required>
+                                    <option value="">Select Semester</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="load-students-btn">Load Students</button>
+                        </div>
+                        <div class="attendance-table-container">
+                            <table class="attendance-table" id="attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-tbody">
+                                    <tr class="no-data">
+                                        <td colspan="4">Please select date, course, and semester to load students</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="attendance-summary" id="attendance-summary" style="display: none;">
+                            <div class="summary-card">
+                                <h4>Attendance Summary</h4>
+                                <div class="summary-stats">
+                                    <div class="summary-item">
+                                        <span class="summary-label">Total Students:</span>
+                                        <span class="summary-value" id="total-students">0</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">Present:</span>
+                                        <span class="summary-value present" id="present-count">0</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">Absent:</span>
+                                        <span class="summary-value absent" id="absent-count">0</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">Attendance %:</span>
+                                        <span class="summary-value" id="attendance-percentage">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="save-attendance-btn">Save Attendance</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-student-examination" class="page-content">
+                    <div class="page-header">
+                        <h1>Examination Schedule</h1>
+                        <p>View and manage examination schedules</p>
+                    </div>
+                    <div class="examination-content">
+                        <div class="exam-filters">
+                            <div class="filter-group">
+                                <label for="exam-semester">Select Semester</label>
+                                <select id="exam-semester" name="exam-semester">
+                                    <option value="">All Semesters</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="exam-course">Select Course</label>
+                                <select id="exam-course" name="exam-course">
+                                    <option value="">All Courses</option>
+                                    <option value="computer-science">Computer Science</option>
+                                    <option value="engineering">Engineering</option>
+                                    <option value="business">Business Administration</option>
+                                    <option value="medicine">Medicine</option>
+                                    <option value="arts">Arts & Humanities</option>
+                                    <option value="science">Natural Sciences</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="add-exam-btn">+ Add New Exam</button>
+                        </div>
+                        <div class="exam-schedule-container">
+                            <div class="exam-cards" id="exam-cards"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-student-list" class="page-content">
+                    <div class="page-header">
+                        <h1>Student List</h1>
+                        <p>View all registered students</p>
+                    </div>
+                    <div class="student-list-content">
+                        <div class="list-filters">
+                            <input type="text" id="search-student" placeholder="Search by name or ID..." class="search-input">
+                            <select id="filter-course-list">
+                                <option value="">All Courses</option>
+                                <option value="computer-science">Computer Science</option>
+                                <option value="engineering">Engineering</option>
+                                <option value="business">Business Administration</option>
+                                <option value="medicine">Medicine</option>
+                                <option value="arts">Arts & Humanities</option>
+                                <option value="science">Natural Sciences</option>
+                            </select>
+                        </div>
+                        <div class="students-table-container">
+                            <table class="students-table">
+                                <thead>
+                                    <tr>
+                                        <th>Student ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Course</th>
+                                        <th>Semester</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body">
+                                    <tr><td colspan="6" class="no-data">No students registered yet.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Module Pages -->
+                <div id="page-course-list" class="page-content">
+                    <div class="page-header">
+                        <h1>All Courses</h1>
+                        <p>Manage and view all available courses</p>
+                    </div>
+                    <div class="courses-grid" id="courses-grid"></div>
+                </div>
+
+                <div id="page-course-computer-science" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Computer Science</h1>
+                        <p>Computer Science Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="computer-science"></div>
+                </div>
+
+                <div id="page-course-engineering" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Engineering</h1>
+                        <p>Engineering Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="engineering"></div>
+                </div>
+
+                <div id="page-course-business" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Business Administration</h1>
+                        <p>Business Administration Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="business"></div>
+                </div>
+
+                <div id="page-course-medicine" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Medicine</h1>
+                        <p>Medicine Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="medicine"></div>
+                </div>
+
+                <div id="page-course-arts" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Arts & Humanities</h1>
+                        <p>Arts & Humanities Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="arts"></div>
+                </div>
+
+                <div id="page-course-science" class="page-content course-page">
+                    <div class="page-header">
+                        <h1>Natural Sciences</h1>
+                        <p>Natural Sciences Course Management</p>
+                    </div>
+                    <div class="course-details" data-course="science"></div>
+                </div>
+
+                <!-- Faculty Module Pages -->
+                <div id="page-faculty-list" class="page-content">
+                    <div class="page-header">
+                        <h1>Faculty List</h1>
+                        <p>View all faculty members</p>
+                    </div>
+                    <div class="faculty-list-content" id="faculty-list-content"></div>
+                </div>
+
+                <div id="page-faculty-assignments" class="page-content">
+                    <div class="page-header">
+                        <h1>Assignments</h1>
+                        <p>Manage course assignments</p>
+                    </div>
+                    <div class="assignments-content" id="assignments-content"></div>
+                </div>
+
+                <div id="page-faculty-grades" class="page-content">
+                    <div class="page-header">
+                        <h1>Grade Management</h1>
+                        <p>Manage student grades</p>
+                    </div>
+                    <div class="grades-content" id="grades-content"></div>
+                </div>
+
+                <!-- Admin Module Pages -->
+                <div id="page-admin-users" class="page-content admin-only">
+                    <div class="page-header">
+                        <h1>User Management</h1>
+                        <p>Manage system users and roles</p>
+                    </div>
+                    <div class="admin-content" id="admin-users-content"></div>
+                </div>
+
+                <div id="page-admin-settings" class="page-content admin-only">
+                    <div class="page-header">
+                        <h1>System Settings</h1>
+                        <p>Configure system settings</p>
+                    </div>
+                    <div class="admin-content" id="admin-settings-content"></div>
+                </div>
+
+                <div id="page-admin-reports" class="page-content admin-only">
+                    <div class="page-header">
+                        <h1>Reports & Analytics</h1>
+                        <p>View system reports and analytics</p>
+                    </div>
+                    <div class="admin-content" id="admin-reports-content"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Exam Modal -->
+    <div class="modal" id="add-exam-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Add New Examination</h2>
+            <form id="add-exam-form">
+                <div class="form-group">
+                    <label for="exam-subject">Subject Name *</label>
+                    <input type="text" id="exam-subject" name="exam-subject" placeholder="Enter Subject Name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exam-date">Exam Date *</label>
+                        <input type="date" id="exam-date" name="exam-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-time-start">Start Time *</label>
+                        <input type="time" id="exam-time-start" name="exam-time-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-time-end">End Time *</label>
+                        <input type="time" id="exam-time-end" name="exam-time-end" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exam-semester-select">Semester *</label>
+                        <select id="exam-semester-select" name="exam-semester-select" required>
+                            <option value="">Select Semester</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-type-select">Exam Type *</label>
+                        <select id="exam-type-select" name="exam-type-select" required>
+                            <option value="">Select Type</option>
+                            <option value="midterm">Midterm</option>
+                            <option value="final">Final</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="assignment">Assignment</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exam-venue">Venue *</label>
+                    <input type="text" id="exam-venue" name="exam-venue" placeholder="Enter Venue" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Examination</button>
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/js/dashboard.js' %}"></script>
+    <!-- Pass Django session data to JavaScript -->
+    <script>
+        // Override localStorage with Django session data if available
+        {% if user_role %}
+            localStorage.setItem('currentRole', '{{ user_role }}');
+        {% endif %}
+        {% if user_name %}
+            var userData = {
+                name: '{{ user_name }}',
+                username: '{{ username|default:"user" }}',
+                role: '{{ user_role|default:"student" }}'
+            };
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+        {% endif %}
+    </script>
+</body>
+</html>
+

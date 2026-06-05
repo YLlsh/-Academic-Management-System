@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    /* ================= Students List Section ================= */
+.students-list-section {
+    margin-top: 50px;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.list-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.list-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.list-header p {
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+/* Table */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.students-table thead {
+    background: #f4f6f8;
+}
+
+.students-table th,
+.students-table td {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.students-table th {
+    font-weight: 600;
+    color: #34495e;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.students-table tbody tr {
+    transition: background 0.3s ease;
+}
+
+.students-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+.students-table td {
+    border-bottom: 1px solid #e5e7eb;
+    color: #2c3e50;
+}
+
+/* Buttons */
+.btn-view {
+    background: #3498db;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-view:hover {
+    background: #2980b9;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+}
+
+/* No Data */
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: #95a5a6;
+    font-style: italic;
+}
+
+</style>
+
+    <div id="page-student-registration" class="page-content active">
+        <div class="page-header">
+            <h1>Student Registration</h1>
+            <p>Register new students to the academic system</p>
+        </div>
+
+        <div class="registration-content">
+            <form class="registration-form" id="registration-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-id">Student ID *</label>
+                        <input type="text"  id="studentID"  name="student_id" placeholder="Enter Student ID"  readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="full-name">Full Name *</label>
+                        <input type="text" id="full-name" name="full_name" placeholder="Enter Full Name" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reg-email">Email Address *</label>
+                        <input type="email" id="reg-email" name="email" placeholder="student@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" maxlength="10" placeholder="+91 7123456789"  oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                    </div>
+
+
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date-of-birth">Date of Birth *</label>
+                        <input type="date" id="date-of-birth" name="date_of_birth" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender *</label>
+                        <select id="gender" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    
+
+                    <div class="form-group">
+                        <label for="semester">Class*</label>
+                        <select id="semester" name="student_class" required>
+                            <option value="">Select Class</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                            <option value="11th">11th</option>
+                            <option value="12th">12th</option>
+                        </select>
+
+                    </div>
+
+                    <div class="form-group" id="courseField" style="display: none;">
+                        <label for="course">Course/Program *</label>
+                        <select id="course" name="course">
+                            <option value="">Select Course</option>
+                            <option value="science">Science</option>
+                            <option value="commerce">Commerce</option>
+                            <option value="arts">Arts</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address *</label>
+                    <textarea id="address" name="address" rows="3" placeholder="Enter full address" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guardian-name">Guardian Name</label>
+                        <input type="text" id="guardian-name" name="guardian_name" placeholder="Guardian's Full Name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guardian-phone">Guardian Phone</label>
+                        <input type="tel" id="guardian-phone" name="guardian_phone"
+                            placeholder="Guardian's Phone Number">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guardian-name">Student Photo</label>
+                        <input type="file" id="student-photo" name="student_photo">
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Register Student</button>
+                    <button type="reset" class="btn btn-secondary">Reset Form</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+
+document.getElementById("registration-form").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const access = localStorage.getItem("access");
+    const refresh = localStorage.getItem("refresh");
+
+    let form = document.getElementById("registration-form");
+    let formData = new FormData(form);
+
+    // Function to send request
+    async function sendRequest(token){
+        return fetch("http://127.0.0.1:8000/api/Student_view/", {
+            method: "POST",
+            headers:{
+                "Authorization": "Bearer " + token
+            },
+            body: formData
+        });
+    }
+
+    let response = await sendRequest(access);
+
+    // If access token expired
+    if(response.status === 401){
+
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/token/refresh/",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                refresh: refresh
+            })
+        });
+
+        const refreshData = await refreshResponse.json();
+
+        if(refreshResponse.ok){
+
+            const newAccess = refreshData.access;
+
+            // save new access token
+            localStorage.setItem("access", newAccess);
+
+            // retry original request
+            response = await sendRequest(newAccess);
+
+        }else{
+            alert("Session expired. Please login again.");
+            window.location = "/login/";
+            return;
+        }
+    }
+
+    const data = await response.json();
+
+    if(response.ok){
+        alert("Student Registered Successfully");
+        form.reset();
+    }else{
+        console.log(data);
+        alert("Error occurred");
+    }
+
+});
+
+</script>
+
+
+
+    <!-- ================= Registered Students List ================= -->
+<div class="students-list-section">
+    <div class="list-header">
+        <h2>Registered Students</h2>
+        <p>List of recently registered students</p>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="students-table">
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Course</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample Row -->
+                 {% for i in student_data %}
+                <tr>
+                    <td> {{i.student_id}}</td>
+                    <td> {{i.full_name}}</td>
+                    <td> {{i.student_class}}</td>
+                    <td> {{i.course}}</td>
+                    <td> {{i.email}}</td>
+                    <td> {{i.phone}}</td>
+                    <td>
+                        <button class="btn-view">View</button>
+                        <button class="btn-delete">Delete</button>
+                    </td>
+                </tr>
+                    {% endfor %}
+                <!-- Empty State -->
+                <!--
+                <tr>
+                    <td colspan="7" class="no-data">No students registered yet</td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- ================= End Students List ================= -->
+
+
+<!-- =============script for generate student id =============== -->
+<script>
+// Function to generate a random 8-digit student ID
+function generateStudentID() {
+    // Generate number between 10000000 and 99999999
+    return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
+
+// Function to create a unique student ID
+function createUniqueStudentID() {
+    let existingIDs = JSON.parse(localStorage.getItem('studentIDs')) || [];
+    let newID;
+
+    do {
+        newID = generateStudentID();
+        newID = `SDT${newID}`
+    } while (existingIDs.includes(newID));
+
+    existingIDs.push(newID);
+    localStorage.setItem('studentIDs', JSON.stringify(existingIDs));
+    return newID;
+}
+
+// Fetch input field
+const studentInput = document.getElementById('studentID');
+
+// Generate and fill the input when page loads
+window.addEventListener('load', () => {
+    studentInput.value = createUniqueStudentID();
+});
+</script>
+<!-- =============END script for generate student id =============== -->
+
+
+<!-- scritp for class select  -->
+<script>
+document.getElementById('semester').addEventListener('change', function () {
+    const courseField = document.getElementById('courseField');
+    const courseSelect = document.getElementById('course');
+    const selectedValue = this.value;
+
+    if (selectedValue === '11th' || selectedValue === '12th') {
+        courseField.style.display = 'block';
+        courseSelect.setAttribute('required', 'required');
+    } else {
+        courseField.style.display = 'none';
+        courseSelect.removeAttribute('required');
+        courseSelect.value = '';
+    }
+});
+</script>
+
+
+    {% endblock %}

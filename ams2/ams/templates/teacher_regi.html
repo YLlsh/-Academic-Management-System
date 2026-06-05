@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div id="page-teacher-registration" class="page-content active">
+    <div class="page-header">
+        <h1>Teacher Registration</h1>
+        <p>Register new teachers to the academic system</p>
+    </div>
+
+    <div class="registration-content">
+        <form class="registration-form" id="registration-form" method="post" >
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teacher ID *</label>
+                    <input type="text" id="teacherID" name="teacher_id" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="full_name" placeholder="Enter Full Name" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="email" placeholder="teacher@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" name="phone" maxlength="10"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date of Joining *</label>
+                    <input type="date" name="date_of_joining" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender *</label>
+                    <select name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department *</label>
+                    <select name="department" required>
+                        <option value="">Select Department</option>
+                        <option value="science">Science</option>
+                        <option value="commerce">Commerce</option>
+                        <option value="arts">Arts</option>
+                        <option value="maths">Mathematics</option>
+                        <option value="computer">Computer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Qualification *</label>
+                    <input type="text" name="qualification" placeholder="M.Sc / B.Ed / PhD" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Address *</label>
+                <textarea name="address" rows="3" required></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Emergency Contact Name</label>
+                    <input type="text" name="emergency_name">
+                </div>
+
+                <div class="form-group">
+                    <label>Emergency Contact Phone</label>
+                    <input type="tel" name="emergency_phone"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'')" maxlength="10">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teacher Photo</label>
+                    <input type="file" name="teacher_photo">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Register Teacher</button>
+                <button type="reset" class="btn btn-secondary">Reset Form</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelector(".registration-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const access = localStorage.getItem("access");  // JWT access token
+
+    let form = e.target;
+    let formData = new FormData(form);
+
+    try {
+        let res = await fetch("http://127.0.0.1:8000/api/Teacher_view/", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + access
+                // ❌ DO NOT set Content-Type (browser sets it automatically for FormData)
+            },
+            body: formData
+        });
+
+        if (res.status === 401) {
+            // 🔁 Try refresh token
+            const refresh = localStorage.getItem("refresh");
+
+            let refreshRes = await fetch("http://127.0.0.1:8000/api/refresh/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ refresh: refresh })
+            });
+
+            let refreshData = await refreshRes.json();
+
+            if (refreshRes.ok) {
+                localStorage.setItem("access", refreshData.access);
+
+                // 🔁 Retry original request
+                let retryRes = await fetch("http://127.0.0.1:8000/api/Teacher_view/", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + refreshData.access
+                    },
+                    body: formData
+                });
+
+                let retryData = await retryRes.json();
+                alert("Teacher Registered Successfully ✅");
+                window.location = '/teacher_regi';
+            } else {
+                alert("Session expired. Please login again ❌");
+            }
+
+        } else {
+            let data = await res.json();
+            alert("Teacher Registered Successfully ✅");
+            window.location = '/teacher_regi';
+        }
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong ❌");
+    }
+});
+</script>
+
+<!-- ================= Registered Teachers List ================= -->
+<div class="students-list-section">
+    <div class="list-header">
+        <h2>Registered Teachers</h2>
+        <p>List of recently registered teachers</p>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="students-table">
+            <thead>
+                <tr>
+                    <th>Teacher ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in teacher_data %}
+                <tr>
+                    <td>{{ i.teacher_id }}</td>
+                    <td>{{ i.full_name }}</td>
+                    <td>{{ i.department }}</td>
+                    <td>{{ i.email }}</td>
+                    <td>{{ i.phone }}</td>
+                    <td>
+                        <button class="btn-view">View</button>
+                        <button class="btn-delete">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ============= Teacher ID Script =============== -->
+<script>
+function generateTeacherID() {
+    return Math.floor(100000 + Math.random() * 900000);
+}
+
+function createUniqueTeacherID() {
+    let ids = JSON.parse(localStorage.getItem('teacherIDs')) || [];
+    let id;
+    do {
+        id = 'TCH' + generateTeacherID();
+    } while (ids.includes(id));
+
+    ids.push(id);
+    localStorage.setItem('teacherIDs', JSON.stringify(ids));
+    return id;
+}
+
+window.onload = () => {
+    document.getElementById('teacherID').value = createUniqueTeacherID();
+};
+</script>
+
+{% endblock %}

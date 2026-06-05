@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Academic Management System</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-page">
+        <div class="login-container">
+            <div class="login-content">
+                <div class="login-header">
+                    <div class="login-role-icon" id="login-role-icon">👤</div>
+                    <h1 id="login-role-title">Login</h1>
+                    <p id="login-role-subtitle">Please enter your credentials to continue</p>
+                </div>
+                <form class="login-form"  id="loginForm" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">Username / Email</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username or email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input autocomplete="off" type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="remember-me" name="remember-me">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        <button type="button" class="btn btn-secondary btn-block" id="back-to-role-btn">Back to Role Selection</button>
+                    </div>
+                    <div class="login-demo-info" id="login-demo-info">
+                        <p><strong>Demo Credentials:</strong></p>
+                        <p id="demo-credentials"></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+ <script>
+
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+    console.log("yes its cliked")
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    try{
+
+        const response = await fetch("http://127.0.0.1:8000/api/access/",{
+            method: "POST",
+            headers:{
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+
+            // store tokens
+            localStorage.setItem("access", data.access);
+            localStorage.setItem("refresh", data.refresh);
+            localStorage.setItem("role", data.role);
+
+            // redirect page
+            alert("Log in successfully ")
+
+            if (data.role === 'teacher' ){
+                window.location.href = "/teacher_page";
+                
+            }
+            else if (data.role === 'clerk' ){
+                window.location.href = "/";
+            }
+            else if (data.role === 'student'){
+                window.location.href = "/student_page";
+            }
+            
+            
+
+        }else{
+
+            alert("Invalid username or password");
+
+        }
+
+    }catch(error){
+        console.error("Login Error:", error);
+    }
+
+});
+
+</script> 
+</body>
+</html>
+

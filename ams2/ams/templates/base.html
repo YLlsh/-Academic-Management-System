@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Academic Management System</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+<body>
+    <!-- Main Dashboard -->
+    <div class="main-dashboard" data-dashboard-page="true">
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="top-nav-content">
+                <div class="logo">
+                    <h2>EduManage</h2>
+                </div>
+                <div class="user-info">
+                    <span class="current-user" id="role">User</span>
+                    <span class="current-role" id="current-role-display">Role</span>
+                    <button class="btn btn-secondary btn-sm" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3>Modules</h3>
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul class="sidebar-menu">
+
+            <!-- Dashboard -->
+            <li class="menu-item">
+                <a href="#" class="menu-link" data-page="dashboard">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Student Module -->
+            <li class="menu-item">
+                <div class="menu-link module-toggle" data-module="student">
+                    <span class="menu-icon">👨‍🎓</span>
+                    <span class="menu-text">Student Module</span>
+                    <span class="menu-arrow">▼</span>
+                </div>
+
+                <ul class="submenu" data-submenu="student">
+                    <li>
+                        <a href="{% url 'student_registration' %}" class="submenu-link">
+                            Student Registration
+                        </a>
+                    </li>
+                    <li><a href="#" class="submenu-link" data-page="student-attendance">Attendance</a></li>
+                    <li><a href="#" class="submenu-link" data-page="student-examination">Examination</a></li>
+                    <li><a href="#" class="submenu-link" data-page="student-list">Student List</a></li>
+                </ul>
+            </li>
+
+            <!-- Faculty Module -->
+             <li class="menu-item">
+                <div class="menu-link module-toggle" data-module="faculty">
+                    <span class="menu-icon">👨‍🏫</span>
+                    <span class="menu-text">Faculty Module</span>
+                    <span class="menu-arrow">▼</span>
+                </div>
+
+                <ul class="submenu" data-submenu="faculty">
+                    <li><a href="{% url 'teacher_regi' %}" class="submenu-link" data-page="faculty-list">Faculty Registration</a></li>
+                    <li><a href="{% url 'assign_class' %}" class="submenu-link" data-page="faculty-list">Assign Class</a></li>
+                    <li><a href="#" class="submenu-link" data-page="faculty-assignments">Assignments</a></li>
+                    <li><a href="#" class="submenu-link" data-page="faculty-grades">Grade Management</a></li>
+                </ul>
+            </li>
+
+            <!-- Course Module -->
+            <li class="menu-item">
+                <div class="menu-link module-toggle" data-module="course">
+                    <span class="menu-icon">📚</span>
+                    <span class="menu-text">Course Module</span>
+                    <span class="menu-arrow">▼</span>
+                </div>
+
+                <ul class="submenu" data-submenu="course">
+                    <li><a href="#" class="submenu-link" data-page="course-list">All Courses</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-computer-science">Computer Science</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-engineering">Engineering</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-business">Business</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-medicine">Medicine</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-arts">Arts & Humanities</a></li>
+                    <li><a href="#" class="submenu-link" data-page="course-science">Natural Sciences</a></li>
+                </ul>
+            </li>
+
+           
+
+            <!-- Admin Module -->
+            <li class="menu-item admin-only">
+                <div class="menu-link module-toggle" data-module="admin">
+                    <span class="menu-icon">⚙️</span>
+                    <span class="menu-text">Admin Module</span>
+                    <span class="menu-arrow">▼</span>
+                </div>
+
+                <ul class="submenu" data-submenu="admin">
+                    <li><a href="#" class="submenu-link" data-page="admin-users">User Management</a></li>
+                    <li><a href="#" class="submenu-link" data-page="admin-settings">System Settings</a></li>
+                    <li><a href="#" class="submenu-link" data-page="admin-reports">Reports & Analytics</a></li>
+                </ul>
+            </li>
+
+        </ul>
+    </nav>
+</aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" data-dashboard-page="true">
+            
+
+              {% block content %}{% endblock %}
+
+        </main>
+    </div>
+
+    
+
+    <script src="{% static 'assets/js/dashboard.js' %}" defer></script>
+
+    <!-- Pass Django session data to JavaScript -->
+    <script>
+        // Override localStorage with Django session data if available
+        
+            const role = localStorage.getItem('role');
+            document.getElementById('role').textContent = role;
+            console.log(role)
+        
+            var userData = {
+                name: '{{ user_name }}',
+                username: '{{ username|default:"user" }}',
+                role: '{{ user_role|default:"student" }}'
+            };
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+
+</script>
+
+<script>
+function parseJWT(token) {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+        return null;
+    }
+}
+
+function isTokenExpired(token) {
+    const decoded = parseJWT(token);
+    if (!decoded || !decoded.exp) return true;
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decoded.exp < currentTime;
+}
+
+function checkAuth() {
+    const accessToken = localStorage.getItem("access");
+    const refreshToken = localStorage.getItem("refresh");
+
+    // ❌ No tokens at all → redirect
+    if (!accessToken && !refreshToken) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    // ❌ Refresh token missing → redirect
+    if (!refreshToken) {
+        window.location.href = "/login/";
+        return;
+    }
+
+    // ❌ Refresh token expired → redirect
+    if (isTokenExpired(refreshToken)) {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        window.location.href = "/login/";
+        return;
+    }
+
+    // ✅ If access token exists but expired → optional refresh logic
+    if (accessToken && isTokenExpired(accessToken)) {
+        console.log("Access token expired, should call refresh API");
+        // you can call refresh API here if needed
+    }
+
+    console.log("User is authenticated");
+}
+
+// Run on page load
+checkAuth();
+</script>
+</body>
+</html>
+

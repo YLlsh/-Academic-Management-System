@@ -1,0 +1,43 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block content %}
+
+<div class="content-wrapper">
+                <!-- Dashboard Page -->
+                <div id="page-dashboard" class="page-content active">
+                    <div class="page-header">
+                        <h1>Dashboard</h1>
+                        <p>Welcome to Academic Management System</p>
+                    </div>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">👨‍🎓</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-students-count">{{student_count}}</h3>
+                                <p>Total Students</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <h3>6</h3>
+                                <p>Active Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👨‍🏫</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-faculty-count">0</h3>
+                                <p>Faculty Members</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <h3 id="dashboard-attendance-percent">0%</h3>
+                                <p>Average Attendance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+{% endblock %}

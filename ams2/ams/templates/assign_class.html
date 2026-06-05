@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .assigned-list {
+        margin-top: 30px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .table th {
+        background-color: #4a90e2;
+        color: white;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1>Assign Class to Teacher</h1>
+        <p>Select teacher and assign a class</p>
+    </div>
+
+    <div class="registration-content">
+        <form  id="formdata">
+          
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Select Teacher</label>
+                    <select name="teacherSelect" id="teacherSelect" required>
+                        <option value="">-- Select Teacher --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Class</label>
+                    <select id="class_name" name="class_name" required>
+                        <option value="">Select Class</option>
+                        <option value="9th">9th</option>
+                        <option value="10th">10th</option>
+                        <option value="11th">11th</option>
+                        <option value="12th">12th</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select Date</label>
+                    <input type="date" id="for_date" name="for_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Time Slot</label>
+                    <select id="time_slot" name="time_slot" required>
+                        <option value="">Select Class</option>
+                        <option value="11:30 12:30">11:30 - 12:30</option>
+                        <option value="13:30 14:30">13:30 - 14:30</option>
+                        <option value="14:30 15:30">14:30 - 15:30</option>
+                        <option value="15:30 16:30">15:30 - 16:30</option>
+                        <option value="17:30 18:30">17:30 - 18:30</option>
+                        <option value="10:30 11:30">10:30 - 11:30</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" onclick="assignClass()" class="btn btn-primary">
+                    Assign Class
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    Reset
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+async function assignClass() {
+    const accessToken = localStorage.getItem("access");
+    const refreshToken = localStorage.getItem("refresh");
+
+
+
+    // function to call API
+    async function sendRequest(token) {
+        return fetch("http://127.0.0.1:8000/api/AssignClassView/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({
+                teacher : document.getElementById("teacherSelect").value,
+                class_name : document.getElementById("class_name").value,
+                for_date : document.getElementById("for_date").value,
+                time_slot : document.getElementById("time_slot").value,
+            })
+        });
+    }
+
+    let response = await sendRequest(accessToken);
+
+    // if token expired → try refresh
+    if (response.status === 401) {
+        console.log("Access token expired, refreshing...");
+
+        const refreshResponse = await fetch("http://127.0.0.1:8000/api/refresh/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        const refreshData = await refreshResponse.json();
+
+        if (refreshResponse.ok) {
+            // save new access token
+            localStorage.setItem("access", refreshData.access);
+
+            // retry original request
+            response = await sendRequest(refreshData.access);
+        } else {
+            alert("Session expired. Please login again.");
+            return;
+        }
+    }
+    else{
+        
+        // alert("Class assign successfully ")
+        // window.location = 'http://127.0.0.1:8000/assign_class/'
+    }
+
+    const result = await response.json();
+
+    if (response.ok) {
+        alert("Class assigned successfully!");
+        console.log(result);
+    } else {
+        console.error(result);
+        alert("Error: " + JSON.stringify(result));
+    }
+}
+</script>
+
+        <!-- for load teacher script  -->
+
+
+    <script>
+async function loadTeachers() {
+    let accessToken = localStorage.getItem("access");
+    let refreshToken = localStorage.getItem("refresh");
+
+    // Function to refresh token
+    async function refreshAccessToken() {
+        const response = await fetch("http://127.0.0.1:8000/api/refresh/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                refresh: refreshToken
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem("access", data.access);
+            return data.access;
+        } else {
+            console.error("Refresh token expired. Login again.");
+            return null;
+        }
+    }
+
+    // Function to call API
+    async function fetchTeachers(token) {
+        return await fetch("http://127.0.0.1:8000/api/Teacher_view/", {
+            method: "GET",
+        headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+    }
+
+    // First attempt
+    let response = await fetchTeachers(accessToken);
+
+    // If token expired → refresh
+    if (response.status === 401) {
+        accessToken = await refreshAccessToken();
+
+        if (!accessToken) return;
+
+        response = await fetchTeachers(accessToken);
+    }
+
+    // Final data handling
+    if (response.ok) {
+        const teachers = await response.json();
+        const select = document.getElementById("teacherSelect");
+
+        teachers.forEach(t => {
+            let option = document.createElement("option");
+            option.value = t.id;
+            option.textContent = t.full_name;
+            select.appendChild(option);
+        });
+    } else {
+        console.error("Failed to load teachers");
+    }
+}
+
+// Call function on page load
+document.addEventListener("DOMContentLoaded", loadTeachers);
+</script>
+
+
+    <div class="assigned-list">
+        <h2>Assigned Classes</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Teacher</th>
+                    <th>Class</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- <tr>
+                    <td>a.teacher.full_name </td>
+                    <td> a.student_class </td>
+                    <td>a.date</td>
+                </tr> -->
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+async function loadTableData() {
+    let accessToken = localStorage.getItem("access");
+    let refreshToken = localStorage.getItem("refresh");
+
+    async function fetchData(token) {
+        return fetch("http://127.0.0.1:8000/api/AssignClassView/", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
+    }
+
+    let response = await fetchData(accessToken);
+
+    // If token expired → use refresh
+    if (response.status === 401 && refreshToken) {
+        const refreshRes = await fetch("http://127.0.0.1:8000/api/refresh/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ refresh: refreshToken })
+        });
+
+        const refreshData = await refreshRes.json();
+        accessToken = refreshData.access;
+        localStorage.setItem("access", accessToken);
+
+        response = await fetchData(accessToken);
+    }
+
+    const data = await response.json();
+
+    const tbody = document.querySelector("table tbody");
+    tbody.innerHTML = ""; // clear old data
+    console.log(data)
+
+    data.forEach(a => {
+        const row = `
+            <tr>
+                <td>${a.teacher_name}</td>
+                <td>${a.class_name}</td>
+                <td>${a.for_date}</td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+// call function on page load
+loadTableData();
+</script>
+
+
+{% endblock %}

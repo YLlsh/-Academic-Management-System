@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Management System - Role Selection</title>
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+</head>
+<body>
+    <!-- Role Selection Page -->
+    <div class="role-selection-page">
+        <div class="role-selection-container">
+            <div class="role-selection-content">
+                <h1>Welcome to Academic Management System</h1>
+                <p>Please select your role to continue</p>
+                <div class="role-cards">
+                    <div class="role-card" data-role="admin">
+                        <div class="role-icon">👨‍💼</div>
+                        <h3>Administrator</h3>
+                        <p>Full system access and management</p>
+                    </div>
+                    <div class="role-card" data-role="faculty">
+                        <div class="role-icon">👨‍🏫</div>
+                        <h3>Faculty</h3>
+                        <p>Manage courses, attendance, and grades</p>
+                    </div>
+                    <div class="role-card" data-role="student">
+                        <div class="role-icon">🎓</div>
+                        <h3>Student</h3>
+                        <p>View courses, attendance, and exams</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'assets/js/role-selection.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EduManage - Take Attendance</title>
+<link rel="stylesheet" href="attendance.css">
+<style>
+
+    body{
+margin:0;
+font-family:Arial;
+background:#f4f6f9;
+}
+
+/* Navbar */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 40px;
+background:#2c3e50;
+color:white;
+}
+
+.logo{
+font-size:22px;
+font-weight:bold;
+color:#6fa8ff;
+}
+
+.nav-links{
+list-style:none;
+display:flex;
+gap:25px;
+}
+
+.nav-links a{
+text-decoration:none;
+color:white;
+}
+
+.logout-btn{
+background:#4a90e2;
+border:none;
+padding:8px 16px;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+
+/* Container */
+
+.container{
+width:80%;
+margin:40px auto;
+}
+
+
+/* Cards */
+
+.card{
+background:white;
+padding:25px;
+border-radius:10px;
+margin-bottom:25px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
+
+
+/* Table */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+th{
+background:#eef3ff;
+}
+
+
+/* Inputs */
+
+select,input[type="date"]{
+padding:8px;
+margin-right:20px;
+margin-top:10px;
+}
+
+
+/* Save Button */
+
+.save-btn{
+margin-top:20px;
+padding:10px 20px;
+background:#4a90e2;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+
+<div class="logo">EduManage</div>
+
+<ul class="nav-links">
+<li><a href="#">Home</a></li>
+<li><a href="#">My Classes</a></li>
+<li><a href="#">Attendance</a></li>
+<li><a href="#">Assignments</a></li>
+<li><a href="#">Profile</a></li>
+</ul>
+
+<button class="logout-btn">Logout</button>
+
+</nav>
+
+
+<!-- Main Container -->
+
+<div class="container">
+
+<h1>Take Attendance</h1>
+
+<!-- Select Class -->
+
+<div class="card">
+
+<label>Select Class</label>
+
+<select id="classSelect">
+<option>Class 10A</option>
+<option>Class 10B</option>
+<option>Class 11A</option>
+</select>
+
+<label>Date</label>
+<input type="date" id="attendanceDate">
+
+</div>
+
+
+<!-- Student List -->
+
+<div class="card">
+
+<h2>Student List</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Student ID</th>
+<th>Name</th>
+<th>Present</th>
+<th>Absent</th>
+</tr>
+</thead>
+
+<tbody id="studentTable">
+
+<tr>
+<td>ST101</td>
+<td>Rahul Sharma</td>
+<td><input type="radio" name="s1" checked></td>
+<td><input type="radio" name="s1"></td>
+</tr>
+
+<tr>
+<td>ST102</td>
+<td>Aisha Patel</td>
+<td><input type="radio" name="s2" checked></td>
+<td><input type="radio" name="s2"></td>
+</tr>
+
+<tr>
+<td>ST103</td>
+<td>Arjun Singh</td>
+<td><input type="radio" name="s3" checked></td>
+<td><input type="radio" name="s3"></td>
+</tr>
+
+</tbody>
+
+</table>
+
+
+<button class="save-btn">Save Attendance</button>
+
+</div>
+
+</div>
+
+<script src="attendance.js"></script>
+<script>
+
+    document.querySelector(".save-btn").addEventListener("click", function(){
+
+let table = document.getElementById("studentTable").rows;
+
+let attendanceData = [];
+
+for(let i=0;i<table.length;i++){
+
+let id = table[i].cells[0].innerText;
+let name = table[i].cells[1].innerText;
+
+let present = table[i].cells[2].querySelector("input").checked;
+
+attendanceData.push({
+student_id:id,
+name:name,
+status: present ? "Present" : "Absent"
+});
+
+}
+
+console.log(attendanceData);
+
+alert("Attendance Saved");
+
+});
+</script>
+
+</body>
+</html>
